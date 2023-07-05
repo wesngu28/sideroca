@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import Input from './(components)/Input'
+import { trophies } from './categories'
 
 export default function Home() {
 
@@ -42,7 +43,7 @@ export default function Home() {
           </div>
           <div className='flex gap-4 items-center'>
             <p>Pick Trophies</p>
-            <Input />
+            <Input categories={trophies} />
           </div>
         </form>
       </div>
