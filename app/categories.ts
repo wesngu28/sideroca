@@ -85,3 +85,29 @@ export const trophies = [
     'Food Quality',
     'Patriotism'
   ]
+
+  export const badges = [
+    'Admin',
+    'Class',
+    'Commended',
+    'Condemned',
+    'Delegate',
+    'Easter Egg',
+    'Forum Mod',
+    'Founder',
+    'Game Mod',
+    'General Assembly Resolution Author',
+    'Security Council Resolution Author',
+    'Historical Resolution Author',
+    'Issues Author',
+    'Issues Editor',
+    'Moderator',
+    'Postmaster',
+    'Postmaster General',
+    'Retired Moderator',
+    'Roleplay Mentor',
+    'Sec Gen',
+    'Secretariat',
+    'Site Supporter',
+    'WA'
+]
