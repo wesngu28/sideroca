@@ -103,6 +103,18 @@ export default function Home() {
                 <p>Pick Badges</p>
                 <MultipleInput categories={badges} suggestions='badges' />
               </div>
+              <div className='grid grid-cols-2 m-2 w-96 gap-4 items-center'>
+                <p>Filter Rarity</p>
+                <select name="rarity" className='text-black p-2'>
+                  <option value={""}>All</option>
+                  <option value={"common"}>Common</option>
+                  <option value={"uncommon"}>Uncommon</option>
+                  <option value={"rare"}>Rare</option>
+                  <option value={"ultra-rare"}>Ultra Rare</option>
+                  <option value={"epic"}>Epic</option>
+                  <option value={"legendary"}>Legendary</option>
+                </select>
+              </div>
               <button className="w-max mt-4 h-10 mb-1 text-sm transition border-0 rounded appearance-none bg-blue-400 p-2 hover:bg-opacity-50" type='submit'>Search</button>
             </form>
           </div>
