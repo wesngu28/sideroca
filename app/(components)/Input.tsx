@@ -63,3 +63,25 @@ export function MultipleInput({ categories, suggestions }: Props) {
         </div>
     );
 }
+
+export function Input({ categories, suggestions }: Props) {
+    const [value, setValue] = useState("");
+    return (
+        <>
+            <input
+                className="p-2 text-black"
+                onChange={(e) => setValue(e.target.value)}
+                autoComplete="off"
+                type="text"
+                value={value}
+                list={suggestions}
+                name={suggestions}
+            />
+            <datalist id={suggestions}>
+                {categories && categories.map((category, index) => (
+                    <option key={index} value={category} />
+                ))}
+            </datalist>
+        </>
+    );
+}

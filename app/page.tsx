@@ -1,7 +1,7 @@
 "use client"
 import { useEffect, useState } from 'react'
-import { MultipleInput } from './(components)/Input'
-import { badges, trophies } from './categories'
+import { MultipleInput, Input } from './(components)/Input'
+import { badges, flags, governments, trophies } from './categories'
 
 export default function Home() {
 
@@ -104,6 +104,10 @@ export default function Home() {
                 <MultipleInput categories={badges} suggestions='badges' />
               </div>
               <div className='grid grid-cols-2 m-2 w-96 gap-4 items-center'>
+                <p>WA Category</p>
+                <Input categories={governments} suggestions='governments' />
+              </div>
+              <div className='grid grid-cols-2 m-2 w-96 gap-4 items-center'>
                 <p>Filter Rarity</p>
                 <select name="rarity" className='text-black p-2'>
                   <option value={""}>All</option>
@@ -114,6 +118,33 @@ export default function Home() {
                   <option value={"epic"}>Epic</option>
                   <option value={"legendary"}>Legendary</option>
                 </select>
+              </div>
+              <div className='grid grid-cols-2 m-2 w-96 gap-4 items-center'>
+                <p>Region</p>
+                <Input suggestions='region' />
+              </div>
+              <div className='grid grid-cols-2 m-2 w-96 gap-4 items-center'>
+                <p>Ex-Nation?</p>
+                <div className='flex gap-2'>
+                  <input type="checkbox" id="exnation" name="exnation" />
+                  <label htmlFor="exnation">Ex-Nation</label>
+                </div>
+              </div>
+              <div className='grid grid-cols-2 m-2 w-96 gap-4 items-center'>
+                <p>Flag</p>
+                <Input categories={flags} suggestions='flag' />
+              </div>
+              <div className='grid grid-cols-2 m-2 w-96 gap-4 items-center'>
+                <p>Motto</p>
+                <Input suggestions='motto' />
+              </div>
+              <div className='grid grid-cols-2 m-2 w-96 gap-4 items-center'>
+                <p>Name</p>
+                <Input suggestions='name' />
+              </div>
+              <div className='grid grid-cols-2 m-2 w-96 gap-4 items-center'>
+                <p>Pretitle</p>
+                <Input suggestions='pretitle' />
               </div>
               <button className="w-max mt-4 h-10 mb-1 text-sm transition border-0 rounded appearance-none bg-blue-400 p-2 hover:bg-opacity-50" type='submit'>Search</button>
             </form>
