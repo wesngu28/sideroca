@@ -89,7 +89,7 @@ export default function Home() {
         <>
           <div className="relative flex">
             <form className='flex flex-col items-center' onSubmit={(e) => servers(e)} name='card'>
-              <div className='grid grid-cols-2 m-2 w-96 gap-4 items-center'>
+              <div className='grid grid-cols-2 m-2 w-72 sm:w-96 gap-4 items-center'>
                 <p>Filter Season</p>
                 <select name="season" required className='text-black p-2'>
                   <option value={"1"}>Season 1</option>
@@ -97,19 +97,19 @@ export default function Home() {
                   <option value={"3"}>Season 3</option>
                 </select>
               </div>
-              <div className='grid grid-cols-2 m-2 w-96 gap-4 items-center'>
+              <div className='grid grid-cols-2 m-2 w-72 sm:w-96 gap-4 items-center'>
                 <p>Pick Trophies</p>
                 <MultipleInput categories={trophies} suggestions='trophies' />
               </div>
-              <div className='grid grid-cols-2 m-2 w-96 gap-4 items-center'>
+              <div className='grid grid-cols-2 m-2 w-72 sm:w-96 gap-4 items-center'>
                 <p>Pick Badges</p>
                 <MultipleInput categories={badges} suggestions='badges' />
               </div>
-              <div className='grid grid-cols-2 m-2 w-96 gap-4 items-center'>
+              <div className='grid grid-cols-2 m-2 w-72 sm:w-96 gap-4 items-center'>
                 <p>WA Category</p>
                 <Input categories={governments} suggestions='governments' />
               </div>
-              <div className='grid grid-cols-2 m-2 w-96 gap-4 items-center'>
+              <div className='grid grid-cols-2 m-2 w-72 sm:w-96 gap-4 items-center'>
                 <p>Filter Rarity</p>
                 <select name="rarity" className='text-black p-2'>
                   <option value={""}>All</option>
@@ -121,30 +121,30 @@ export default function Home() {
                   <option value={"legendary"}>Legendary</option>
                 </select>
               </div>
-              <div className='grid grid-cols-2 m-2 w-96 gap-4 items-center'>
+              <div className='grid grid-cols-2 m-2 w-72 sm:w-96 gap-4 items-center'>
                 <p>Region</p>
                 <Input suggestions='region' />
               </div>
-              <div className='grid grid-cols-2 m-2 w-96 gap-4 items-center'>
+              <div className='grid grid-cols-2 m-2 w-72 sm:w-96 gap-4 items-center'>
                 <p>Ex-Nation?</p>
                 <div className='flex gap-2'>
                   <input type="checkbox" id="exnation" name="exnation" />
                   <label htmlFor="exnation">Ex-Nation</label>
                 </div>
               </div>
-              <div className='grid grid-cols-2 m-2 w-96 gap-4 items-center'>
+              <div className='grid grid-cols-2 m-2 w-72 sm:w-96 gap-4 items-center'>
                 <p>Flag</p>
                 <Input categories={flags} suggestions='flag' />
               </div>
-              <div className='grid grid-cols-2 m-2 w-96 gap-4 items-center'>
+              <div className='grid grid-cols-2 m-2 w-72 sm:w-96 gap-4 items-center'>
                 <p>Motto</p>
                 <Input suggestions='motto' />
               </div>
-              <div className='grid grid-cols-2 m-2 w-96 gap-4 items-center'>
+              <div className='grid grid-cols-2 m-2 w-72 sm:w-96 gap-4 items-center'>
                 <p>Name</p>
                 <Input suggestions='name' />
               </div>
-              <div className='grid grid-cols-2 m-2 w-96 gap-4 items-center'>
+              <div className='grid grid-cols-2 m-2 w-72 sm:w-96 gap-4 items-center'>
                 <p>Pretitle</p>
                 <Input suggestions='pretitle' />
               </div>

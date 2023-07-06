@@ -22,13 +22,12 @@ export function MultipleInput({ categories, suggestions }: Props) {
 
     return (
         <div className="flex gap-4">
-            <div className="flex flex-col gap-2 text-black">
+            <div className="flex flex-col gap-2">
                 {
                     inputs.map((input, index) => {
                         return <div key={index}>
-                            <div>
                                 <input
-                                    className="p-2 text-black"
+                                    className="p-2 text-black max-w-[136px] sm:max-w-[184px]"
                                     onChange={(e) => handleInputChange(index, e.target.value)}
                                     autoComplete="off"
                                     type="text"
@@ -42,14 +41,15 @@ export function MultipleInput({ categories, suggestions }: Props) {
                                         <option key={index} value={category} />
                                     ))}
                                 </datalist>
-                            </div>
                             {suggestions === "trophies" && input && !input.includes('!') && <>
+                                <div className="flex gap-2">
                                 <input type="checkbox" id={`cb${index}1%`} name={`1percent`} />
                                 <label htmlFor={`cb${index}1%`}>Top 1%</label>
                                 <input type="checkbox" id={`cb${index}5%`} name={`5percent`} />
                                 <label htmlFor={`cb${index}5%`}>Top 5%</label>
                                 <input type="checkbox" id={`cb${index}10%`} name={`10percent`} />
                                 <label htmlFor={`cb${index}10%`}>Top 10%</label>
+                                </div>
                             </>}
                         </div>
                     })
