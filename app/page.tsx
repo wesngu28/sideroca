@@ -61,6 +61,7 @@ export default function Home() {
       if (formData.get('flag')) baseString += `&flag=${formData.get('flag')}`
       if (formData.get('motto')) baseString += `&motto=${formData.get('motto')}`
       if (formData.get('pretitle')) baseString += `&pretitle=${formData.get('pretitle')}`
+      if (formData.get('exnation')) baseString += `&exnation`
 
       const querySet = new Set(queries)
       querySet.add(baseString.replace('https://api.nsupc.dev/cards/v1?', ''))
