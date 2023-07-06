@@ -1,5 +1,5 @@
 "use client"
-import { useEffect, useState } from 'react'
+import { FormEvent, MouseEvent, useEffect, useState } from 'react'
 import { MultipleInput, Input } from './(components)/Input'
 import { badges, flags, governments, trophies } from './categories'
 
@@ -10,15 +10,15 @@ export default function Home() {
   const [queries, setQueries] = useState<string[]>([])
   const [lastQuery, setLastQuery] = useState("")
   useEffect(() => {
-    setQueries(JSON.parse(localStorage.getItem('queries') || '[]') || [])
+    let queries = localStorage.getItem('queries')
+    if (queries) setQueries(JSON.parse(queries))
   }, [])
 
-  async function servers(e: any, baseString?: string) {
+  async function servers(e: FormEvent<HTMLFormElement> | MouseEvent<HTMLButtonElement, globalThis.MouseEvent>, baseString?: string) {
     e.preventDefault()
     let season = ""
-    console.log(baseString)
     if (!baseString) {
-      const form = e.target;
+      const form = e.target as HTMLFormElement;
       const formData = new FormData(form);
       season = formData.get('season') as string
       baseString = `https://api.nsupc.dev/cards/v1?season=${season}`
@@ -72,6 +72,7 @@ export default function Home() {
       method: "POST"
     })
     const cardsJson = await getCards.json()
+    console.log(cardsJson)
     const nationNames: string[] = Object.values(cardsJson.nations)
     const nationIds = Object.keys(cardsJson.nations)
     if (season) season = baseString?.split('?season=')[1][0] as string
@@ -157,7 +158,7 @@ export default function Home() {
       }
       {cardLinks.length > 0 &&
         <>
-          <button className="w-max mt-4 h-10 mb-1 text-sm transition border-0 rounded appearance-none bg-blue-400 p-2 hover:bg-opacity-50 mb-8" onClick={() => {
+          <button className="w-max mt-4 h-10 text-sm transition border-0 rounded appearance-none bg-blue-400 p-2 hover:bg-opacity-50 mb-8" onClick={() => {
             setCardLinks([])
           }}>New Query</button>
           <p className='text-lg font-bold mb-2'>{lastQuery}</p>
