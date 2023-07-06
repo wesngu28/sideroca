@@ -73,7 +73,6 @@ export default function Home() {
       method: "POST"
     })
     const cardsJson = await getCards.json()
-    console.log(cardsJson)
     const nationNames: string[] = Object.values(cardsJson.nations)
     const nationIds = Object.keys(cardsJson.nations)
     if (season) season = baseString?.split('?season=')[1][0] as string
@@ -148,18 +147,18 @@ export default function Home() {
                 <p>Pretitle</p>
                 <Input suggestions='pretitle' />
               </div>
-              <button className="w-max mt-4 h-10 mb-1 text-sm transition border-0 rounded appearance-none bg-blue-400 p-2 hover:bg-opacity-50" type='submit'>Search</button>
+              <button data-umami-event="Search Query" className="w-max mt-4 h-10 mb-1 text-sm transition border-0 rounded appearance-none bg-blue-400 p-2 hover:bg-opacity-50" type='submit'>Search</button>
             </form>
           </div>
           <div className='flex flex-col mt-16 gap-4'>
             <p className='text-lg font-bold mb-2'>Previous Queries</p>
-            {queries.map(query => <button key={query} onClick={(e) => servers(e, `https://api.nsupc.dev/cards/v1?${query}`)}>{query}</button>)}
+            {queries.map(query => <button data-umami-event="Viewed Previous Query" key={query} onClick={(e) => servers(e, `https://api.nsupc.dev/cards/v1?${query}`)}>{query}</button>)}
           </div>
         </>
       }
       {cardLinks.length > 0 &&
         <>
-          <button className="w-max mt-4 h-10 text-sm transition border-0 rounded appearance-none bg-blue-400 p-2 hover:bg-opacity-50 mb-8" onClick={() => {
+          <button data-umami-event="Make New Query" className="w-max mt-4 h-10 text-sm transition border-0 rounded appearance-none bg-blue-400 p-2 hover:bg-opacity-50 mb-8" onClick={() => {
             setCardLinks([])
           }}>New Query</button>
           <p className='text-lg font-bold mb-2'>{lastQuery}</p>

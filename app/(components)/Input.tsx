@@ -55,10 +55,9 @@ export function MultipleInput({ categories, suggestions }: Props) {
                     })
                 }
             </div>
-            <button className="text-lg bold" onClick={(e) => {
+            <button data-umami-event={`${suggestions} row added`} className="text-lg bold" onClick={(e) => {
                 e.preventDefault()
                 addInput()
-                console.log(inputs)
             }}>+</button>
         </div>
     );
