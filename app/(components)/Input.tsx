@@ -25,7 +25,7 @@ export function MultipleInput({ categories, suggestions }: Props) {
             <div className="flex flex-col gap-2 text-black">
                 {
                     inputs.map((input, index) => {
-                        return <div>
+                        return <div key={index}>
                             <div>
                                 <input
                                     className="p-2 text-black"
