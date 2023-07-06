@@ -64,7 +64,8 @@ export default function Home() {
 
       const querySet = new Set(queries)
       querySet.add(baseString.replace('https://api.nsupc.dev/cards/v1?', ''))
-      localStorage.setItem('queries', JSON.stringify(queries));
+      localStorage.setItem('queries', JSON.stringify(Array.from(querySet)));
+      setQueries(Array.from(querySet).reverse())
     }
 
     const getCards = await fetch('/api', {
