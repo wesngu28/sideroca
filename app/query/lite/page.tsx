@@ -1,9 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
 
-export const metadata = {
-    title: 'Cards - Query'
-}
 export default function Query() {
     const [cardLinks, setCardLinks] = useState<string[]>([])
     const [cardNames, setCardNames] = useState<string[]>([])
