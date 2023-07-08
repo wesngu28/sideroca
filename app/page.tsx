@@ -67,6 +67,7 @@ export default function Home() {
       if (formData.get('motto')) baseString += `&motto=${formData.get('motto')}`
       if (formData.get('pretitle')) baseString += `&pretitle=${formData.get('pretitle')}`
       if (formData.get('exnation')) baseString += `&exnation`
+      if (formData.get('collection')) baseString += `&collection=${formData.get('collection')}`
 
       const querySet = new Set(queries)
       querySet.add(baseString.replace('https://api.nsupc.dev/cards/v1?', ''))
@@ -139,6 +140,10 @@ export default function Home() {
           <div className='grid grid-cols-2 m-2 w-72 sm:w-96 gap-4 items-center'>
             <p>Pretitle</p>
             <Input suggestions='pretitle' />
+          </div>
+          <div className='grid grid-cols-2 m-2 w-72 sm:w-96 gap-4 items-center'>
+            <p>Collection</p>
+            <Input suggestions='collection' />
           </div>
           <button data-umami-event="Search Query" className="w-max mt-4 h-10 mb-1 text-sm transition border-0 rounded appearance-none bg-blue-400 p-2 hover:bg-opacity-50" type='submit'>Search</button>
         </form>

@@ -11,5 +11,6 @@ export interface Card {
     DESCRIPTION: string
     BADGES: {[key: string]: string}
     TROPHIES: {[key: string]: string}
+    inCollection?: boolean
   }
   

@@ -5,13 +5,13 @@ import { S2S3Description } from "./S2S3Description"
 
 export function S1S2Card({ card }: { card: Card }) {
     return (
-        <div className="deckcard-container">
+        <div className={`deckcard-container ${card.inCollection ? 'border-blue-400 border-1 border-solid' : 'border-red-600 border-1 border-solid'}`}>
             <div className={`deckcard deckcard-season-${card.SEASON}`} data-cardid={card.ID} data-season={card.SEASON}>
                 <figure className={`front deckcard-category-${card.CARDCATEGORY}`} >
                     <div className="deckcard-flag"
                         style={{ backgroundImage: `url(https://www.nationstates.net/images/cards/s${card.SEASON}/${card.FLAG})` }}>
                     </div>
-                    <div className="deckcard-category">{card.CATEGORY}</div>
+                    <div className="deckcard-category"></div>
                     <div className="deckcard-title"><a href="nation=${name}" className="nlink nameblock"><span
                         className="nnameblock"><span className="ntype">The {card.TYPE} of</span> <span className="nname"> {card.NAME}</span></span></a></div>
                     <div className="deckcard-lower">

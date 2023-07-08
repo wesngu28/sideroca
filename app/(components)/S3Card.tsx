@@ -4,7 +4,7 @@ import { S2S3Description } from "./S2S3Description";
 
 export function S3Card({ card }: { card: Card }) {
     return (
-        <div className="deckcard-container">
+        <div className={`deckcard-container ${card.inCollection ? 'border-blue-400 border-1 border-solid' : 'border-red-600 border-1 border-solid'}`}>
             <div className="deckcard deckcard-season-3" data-cardid={card.ID} data-season="3">
                 <figure className={`front deckcard-category-${card.CARDCATEGORY}`}>
                     <div className="s3-content">

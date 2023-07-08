@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import '../styles.css'
-import { s1, s2, s3 } from '../(helpers)/Ranges'
+import { s1, s2, s3 } from '../(helpers)/ranges'
 import { S3Card } from '../(components)/S3Card'
 import { S1S2Card } from '../(components)/S1S2Card'
 import { Card } from '../(helpers)/models'
@@ -14,7 +14,17 @@ export default function Query() {
 
     useEffect(() => {
         async function fetcher() {
-            const baseString = window.location.href.replace('http://localhost:3000/query', 'https://api.nsupc.dev/cards/v1')
+            let baseString = window.location.href.replace('http://localhost:3000/query', 'https://api.nsupc.dev/cards/v1')
+            const collectionIdx = baseString.indexOf('&collection')
+            let collectionCards: any = {}
+            if (collectionIdx !== -1) {
+                collectionCards = await fetch('/api/collection', {
+                    body: baseString.substring(collectionIdx),
+                    method: "POST"
+                })
+                collectionCards = await collectionCards.json()
+                baseString = baseString.substring(0, collectionIdx)
+            }
             const getCards = await fetch('/api', {
                 body: baseString,
                 method: "POST"
@@ -31,7 +41,15 @@ export default function Query() {
                 });
                 const relevance = await fetch(`https://raw.githubusercontent.com/wesngu28/cardqueries/main/Card%20Lists/${season}_${range}.json`);
                 const relevantNations: Card[] = await relevance.json();
-                return relevantNations.find(nation => Number(nation.ID) === Number(nationId));
+                if (Object.keys(collectionCards).length > 0) {
+                    if (collectionCards.CARDS.COLLECTION.DECK.CARD) {
+                        const inCollection = collectionCards.CARDS.COLLECTION.DECK.CARD.some(
+                            (collectionCard: { CARDID: any }) => collectionCard.CARDID === Number(nationId)
+                        );
+                        return { ...relevantNations.find(nation => Number(nation.ID) === Number(nationId)), inCollection };
+                    }
+                }
+                return relevantNations.find(nation => Number(nation.ID) === Number(nationId))
             }));
             const links = nationIds.map(id => `https://www.nationstates.net/page=deck/card=${id}/season=${baseString?.split('?season=')[1][0]}`)
             setCorrespondingJson(cardList as Card[])
@@ -51,14 +69,19 @@ export default function Query() {
                 <>
                     <p className='text-lg font-bold mb-2'>{lastQuery}</p>
                     <div className='flex flex-wrap justify-center content-center'>
-                        {correspondingJson.map((card, i) => {
-                            return (
-                                season !== "3" ?
+                        {correspondingJson
+                            .sort((a, b) => {
+                                if (a.inCollection && !b.inCollection) return 1;
+                                if (!a.inCollection && b.inCollection) return -1;
+                                return 0;
+                            })
+                            .map((card, i) => {
+                                return season !== "3" ? (
                                     <S1S2Card card={card} />
-                                    :
+                                ) : (
                                     <S3Card card={card} />
-                            )
-                        })}
+                                );
+                            })}
                     </div>
                 </>
             }
