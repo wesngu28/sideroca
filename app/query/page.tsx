@@ -6,11 +6,46 @@ import { S3Card } from '../(components)/S3Card'
 import { S1S2Card } from '../(components)/S1S2Card'
 import { Card } from '../(helpers)/models'
 
+function downloadCSV(data: Card[], filename: string) {
+    const csvData = convertJSONToCSV(data);
+    const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', filename);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+function convertJSONToCSV(jsonData: Card[]) {
+    const headers = Object.keys(jsonData[0]);
+    const csvRows = [];
+    csvRows.push(headers.join(','));
+    jsonData.forEach((row) => {
+        const values = headers.map((header) => {
+            const escapedValue = String(row[header as keyof Card]).replace(/"/g, '""');
+            return `"${escapedValue}"`;
+        });
+        csvRows.push(values.join(','));
+    });
+    return csvRows.join('\n');
+}
+
+
 export default function Query() {
     const [season, setSeason] = useState<string>("")
     const [cardLinks, setCardLinks] = useState<string[]>([])
     const [correspondingJson, setCorrespondingJson] = useState<Array<Card>>([])
     const [lastQuery, setLastQuery] = useState("")
+
+    const handleDownload = () => {
+        if (correspondingJson.length > 0) {
+            const filename = `${lastQuery}.csv`;
+            downloadCSV(correspondingJson, filename);
+        }
+    };
 
     useEffect(() => {
         async function fetcher() {
@@ -23,7 +58,6 @@ export default function Query() {
                     method: "POST"
                 })
                 collectionCards = await collectionCards.json()
-                baseString = baseString.substring(0, collectionIdx)
             }
             const getCards = await fetch('/api', {
                 body: baseString,
@@ -67,6 +101,12 @@ export default function Query() {
             </a>
             {cardLinks.length > 0 &&
                 <>
+                    <button
+                        onClick={handleDownload}
+                        className="w-max mt-4 h-10 text-sm transition border-0 rounded appearance-none bg-blue-400 p-2 hover:bg-opacity-50 mb-8"
+                    >
+                        Download Card List (CSV)
+                    </button>
                     <p className='text-lg font-bold mb-2'>{lastQuery}</p>
                     <div className='flex flex-wrap justify-center content-center'>
                         {correspondingJson

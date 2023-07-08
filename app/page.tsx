@@ -6,8 +6,7 @@ import { badges, flags, governments, trophies } from './categories'
 export default function Home() {
 
   const [queries, setQueries] = useState<string[]>([])
-  const [isPackResults, setIsPackResults] = useState(
-    localStorage.getItem('result') ? localStorage.getItem('result') === "true" ? true : false : true);
+  const [isPackResults, setIsPackResults] = useState(true)
   
   function switchToggle() {
     setIsPackResults(!isPackResults)
@@ -17,6 +16,7 @@ export default function Home() {
   useEffect(() => {
     let queries = localStorage.getItem('queries')
     if (queries) setQueries(JSON.parse(queries))
+    setIsPackResults(localStorage.getItem('result') ? localStorage.getItem('result') === "true" ? true : false : true)
   }, [])
 
   async function servers(e: FormEvent<HTMLFormElement> | MouseEvent<HTMLButtonElement, globalThis.MouseEvent>, baseString?: string) {
