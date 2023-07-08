@@ -1,3 +1,4 @@
+import Image from "next/image"
 import { badges } from "../(helpers)/specialBadges"
 
 interface Props { cardBadges: string[], cardTrophies: string[] }
@@ -10,7 +11,7 @@ export function Badges({ cardBadges, cardTrophies }: Props) {
                     if (badges[badge]) {
                         let badge_img = badges[badge]
                         return (
-                            <img src={`https://www.nationstates.net/images/trophies/${badge_img}.png`}
+                            <Image alt={badge} key={badge} src={`https://www.nationstates.net/images/trophies/${badge_img}.png`}
                                 className="trophy inline" title={`${badge}`} />
                         )
                     }
@@ -19,7 +20,7 @@ export function Badges({ cardBadges, cardTrophies }: Props) {
             </div>
             <div id="trophycabinet">
                 {cardTrophies.map((trophy, i) =>
-                    <img src={`https://www.nationstates.net/images/trophies/${trophy.toLowerCase()}.png`} className="trophy inline"
+                    <Image key={trophy} src={`https://www.nationstates.net/images/trophies/${trophy.toLowerCase()}.png`} className="trophy inline"
                         alt={`${trophy.toLowerCase} ranked ${cardTrophies[i]}`} />
                 )}
             </div>

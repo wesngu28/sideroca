@@ -22,10 +22,8 @@ export function S1S2Card({ card }: { card: Card }) {
                                 if (banners[badge]) {
                                     let badge_img = banners[badge]
                                     return (
-                                        <div>
-                                            <div className="badge">
-                                                <div className={badge_img}><i className="icon-flash"></i>{badge}</div>
-                                            </div>
+                                        <div key={badge} className="badge">
+                                            <div className={badge_img}><i className="icon-flash"></i>{badge}</div>
                                         </div>
                                     )
                                 }
