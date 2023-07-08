@@ -36,7 +36,6 @@ function convertJSONToCSV(jsonData: Card[]) {
 
 export default function Query() {
     const [season, setSeason] = useState<string>("")
-    const [cardLinks, setCardLinks] = useState<string[]>([])
     const [correspondingJson, setCorrespondingJson] = useState<Array<Card>>([])
     const [lastQuery, setLastQuery] = useState("")
 
@@ -85,9 +84,7 @@ export default function Query() {
                 }
                 return relevantNations.find(nation => Number(nation.ID) === Number(nationId))
             }));
-            const links = nationIds.map(id => `https://www.nationstates.net/page=deck/card=${id}/season=${baseString?.split('?season=')[1][0]}`)
             setCorrespondingJson(cardList as Card[])
-            setCardLinks(links)
             setLastQuery(baseString.replace('https://api.nsupc.dev/cards/v1?', ''))
         }
         fetcher()
@@ -99,7 +96,7 @@ export default function Query() {
                     New Query
                 </button>
             </a>
-            {cardLinks.length > 0 &&
+            {correspondingJson.length > 0 &&
                 <>
                     <button
                         onClick={handleDownload}
