@@ -8,7 +8,7 @@ export default function Query() {
 
     useEffect(() => {
         async function fetcher() {
-            const baseString = window.location.href.replace('http://localhost:3000/query/lite', 'https://api.nsupc.dev/cards/v1')
+            const baseString = window.location.href.replace(`${process.env.NEXT_PUBLIC_SITE}/query/lite`, 'https://api.nsupc.dev/cards/v1')
             const getCards = await fetch('/api', {
                 body: baseString,
                 method: "POST"

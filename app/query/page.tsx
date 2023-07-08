@@ -49,7 +49,7 @@ export default function Query() {
 
     useEffect(() => {
         async function fetcher() {
-            let baseString = window.location.href.replace('http://localhost:3000/query', 'https://api.nsupc.dev/cards/v1')
+            let baseString = window.location.href.replace(`${process.env.NEXT_PUBLIC_SITE}/query`, 'https://api.nsupc.dev/cards/v1')
             const collectionIdx = baseString.indexOf('&collection')
             let collectionCards: any = {}
             if (collectionIdx !== -1) {
