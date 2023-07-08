@@ -1,4 +1,8 @@
 /** @type {import('tailwindcss').Config} */
+const plugin = require("tailwindcss/plugin");
+const fs = require("fs");
+const postcss = require("postcss");
+
 module.exports = {
   content: [
     './pages/**/*.{js,ts,jsx,tsx,mdx}',
@@ -14,5 +18,18 @@ module.exports = {
       },
     },
   },
-  plugins: [],
+  corePlugins: {
+    preflight: false,
+  },
+  plugins: [plugin(function ({ addBase }) {
+    const preflightStyles = postcss.parse(
+      fs.readFileSync(require.resolve('tailwindcss/lib/css/preflight.css'), "utf8"),
+    );
+  
+    preflightStyles.walkRules((rule) => {
+      rule.selector = ".tailwind-preflight " + rule.selector;
+    });
+  
+    addBase(preflightStyles.nodes);
+  })],
 }

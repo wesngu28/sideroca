@@ -69,7 +69,7 @@ export default function Home() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center p-12">
+    <main className="tailwind-preflight flex min-h-screen flex-col items-center p-12">
       <div className="relative flex">
         <form className='flex flex-col items-center' onSubmit={(e) => servers(e)} name='card'>
           <div className='grid grid-cols-2 m-2 w-72 sm:w-96 gap-4 items-center'>
