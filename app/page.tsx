@@ -6,6 +6,14 @@ import { badges, flags, governments, trophies } from './categories'
 export default function Home() {
 
   const [queries, setQueries] = useState<string[]>([])
+  const [isPackResults, setIsPackResults] = useState(
+    localStorage.getItem('result') ? localStorage.getItem('result') === "true" ? true : false : true);
+  
+  function switchToggle() {
+    setIsPackResults(!isPackResults)
+    localStorage.setItem('result', `${!isPackResults}`)
+  }
+
   useEffect(() => {
     let queries = localStorage.getItem('queries')
     if (queries) setQueries(JSON.parse(queries))
@@ -65,7 +73,8 @@ export default function Home() {
       localStorage.setItem('queries', JSON.stringify(Array.from(querySet)));
       setQueries(Array.from(querySet).reverse())
     }
-    window.location.href = `/query?${baseString}`
+    if(isPackResults) window.location.href = `/query?${baseString}`
+    else window.location.href = `/query/lite?${baseString}`
   }
 
   return (
@@ -134,6 +143,13 @@ export default function Home() {
           <button data-umami-event="Search Query" className="w-max mt-4 h-10 mb-1 text-sm transition border-0 rounded appearance-none bg-blue-400 p-2 hover:bg-opacity-50" type='submit'>Search</button>
         </form>
       </div>
+      <label className="relative inline-flex items-center cursor-pointer mt-6">
+        <input type="checkbox" value="" className="sr-only peer" checked={isPackResults} onChange={() => switchToggle()}/>
+        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+        <span className="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300">
+          {isPackResults ? 'Pack Results' : 'Lite Mode'}
+        </span>
+      </label>
       <div className='flex flex-col mt-16 gap-4'>
         <p className='text-lg font-bold mb-2'>Previous Queries</p>
         {queries.map(query => <button data-umami-event="Viewed Previous Query" key={query} onClick={(e) => servers(e, query)}>{query}</button>)}
