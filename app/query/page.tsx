@@ -6,6 +6,7 @@ import { S3Card } from '../(components)/S3Card'
 import { S1S2Card } from '../(components)/S1S2Card'
 import { Card } from '../(helpers)/models'
 import { useSearchParams } from "next/navigation"
+import { XMLParser } from 'fast-xml-parser'
 
 function downloadCSV(data: Card[], filename: string) {
     const csvData = convertJSONToCSV(data);
@@ -56,18 +57,18 @@ export default function Query() {
                 const collection = searchParams.get('collection')
                 let collectionCards: any = {}
                 if (collection) {
-                    if (!isNaN(parseInt(collection))) {
-                        collectionCards = await fetch('/api/collection', {
-                            body: `collection;collectionid=${collection}`,
-                            method: "POST"
-                        })
-                    } else {
-                        collectionCards = await fetch('/api/collection', {
-                            body: `deck;nationname=${collection}`,
-                            method: "POST"
-                        })
-                    }
-                    collectionCards = await collectionCards.json()
+                    let reqText = ""
+                    if (!isNaN(parseInt(collection))) reqText = `collection;collectionid=${collection}`
+                    else reqText =`deck;nationname=${collection}`
+                    const cardsReq = await fetch(`https://www.nationstates.net/cgi-bin/api.cgi?q=cards+${reqText}`, {
+                        headers: {
+                            'User-Agent': "Kractero card queries"
+                        }
+                    })
+                    const cardsText = await cardsReq.text()
+                    const parser = new XMLParser()
+                    collectionCards = parser.parse(cardsText)
+                    if (!(collectionCards.CARDS.COLLECTION && collectionCards.CARDS.COLLECTION.DECK.CARD) && !(collectionCards.CARDS.DECK && collectionCards.CARDS.DECK.CARD)) throw Error
                 }
                 if (!collectionCards.error) {
                     const getCards = await fetch('/api', {
@@ -109,7 +110,7 @@ export default function Query() {
             }
         }
         fetcher()
-    }, [])
+    }, [searchParams])
     return (
         <main className="flex min-h-screen flex-col items-center p-12">
             <a href="/">
