@@ -472,7 +472,7 @@ td .deckcard-token {
 .deckcard .back {
     border-radius: 2px;
     background: #eaeae2;
-    background: url(/images/island_small.png) #eaeae2;
+    background: url(https://www.nationstates.net/images/island_small.png) #eaeae2;
     background-repeat: no-repeat;
     background-position: center
 }
@@ -1528,6 +1528,18 @@ body {
     font-family: helvetica neue, Verdana, Tahoma, sans-serif
 }
 
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: #000;
+      --foreground-rgb: 255, 255, 255;
+      --background-start-rgb: 0, 0, 0;
+      --background-end-rgb: 0, 0, 0;
+    }
+    .deckcard {
+        background-color: #fff;
+    }
+  }
+
 img {
     border: 0
 }
@@ -1723,7 +1735,7 @@ a.nameblock {
 .semimod_status {
     background-color: #aa9030;
     border-color: #aa9030;
-    background-image: url(/images/issues_editor_bg.png);
+    background-image: url(https://www.nationstates.net/images/issues_editor_bg.png);
     background-repeat: no-repeat;
     background-position: left center;
     padding-left: 28px
@@ -1732,7 +1744,7 @@ a.nameblock {
 .mentor_status {
     background-color: #3c6;
     border-color: #3c6;
-    background-image: url(/images/rp_mentor_bg.png);
+    background-image: url(https://www.nationstates.net/images/rp_mentor_bg.png);
     background-repeat: no-repeat;
     background-position: left center;
     padding-left: 24px
@@ -1748,33 +1760,6 @@ a.nameblock {
 .wasg_ret_status {
     background-color: #aaaa90;
     border-color: #ccc
-}
-
-.newnonflagstuff .scbadge {
-    display: block;
-    position: relative;
-    -webkit-transform: translateY(-50%);
-    -ms-transform: translateY(-50%);
-    transform: translateY(-50%);
-    z-index: 3;
-    vertical-align: top;
-    float: right;
-    margin-right: 1%;
-    width: 80px;
-    filter: drop-shadow(0.1em 0.1em 0.1em #999)
-}
-
-.newnonflagstuff .badge {
-    display: block;
-    position: relative;
-    -webkit-transform: translateY(-50%);
-    -ms-transform: translateY(-50%);
-    transform: translateY(-50%);
-    z-index: 3;
-    vertical-align: top;
-    float: right;
-    margin-right: 1%;
-    box-shadow: 0 4px 4px rgba(0, 0, 0, .5)
 }
 
 #trophycabinet {
