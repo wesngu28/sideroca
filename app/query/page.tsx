@@ -5,6 +5,7 @@ import { s1, s2, s3 } from '../(helpers)/ranges'
 import { S3Card } from '../(components)/S3Card'
 import { S1S2Card } from '../(components)/S1S2Card'
 import { Card } from '../(helpers)/models'
+import { useSearchParams } from "next/navigation"
 
 function downloadCSV(data: Card[], filename: string) {
     const csvData = convertJSONToCSV(data);
@@ -37,7 +38,9 @@ function convertJSONToCSV(jsonData: Card[]) {
 export default function Query() {
     const [season, setSeason] = useState<string>("")
     const [correspondingJson, setCorrespondingJson] = useState<Array<Card>>([])
-    const [lastQuery, setLastQuery] = useState("")
+    const [errorMessage, setErrorMessage] = useState<string>("");
+    const searchParams = useSearchParams()
+    const lastQuery = searchParams.toString()
 
     const handleDownload = () => {
         if (correspondingJson.length > 0) {
@@ -48,44 +51,62 @@ export default function Query() {
 
     useEffect(() => {
         async function fetcher() {
-            let baseString = window.location.href.replace(`${process.env.NEXT_PUBLIC_SITE}/query`, 'https://api.nsupc.dev/cards/v1')
-            const collectionIdx = baseString.indexOf('&collection')
-            let collectionCards: any = {}
-            if (collectionIdx !== -1) {
-                collectionCards = await fetch('/api/collection', {
-                    body: baseString.substring(collectionIdx),
-                    method: "POST"
-                })
-                collectionCards = await collectionCards.json()
-            }
-            const getCards = await fetch('/api', {
-                body: baseString,
-                method: "POST"
-            })
-            const cardsJson = await getCards.json()
-            const nationIds = Object.keys(cardsJson.nations)
-            const cardList = await Promise.all(nationIds.map(async (nationId) => {
-                const season = baseString?.split('?season=')[1][0];
-                setSeason(season);
-                const jsonRanges = (season === "1") ? s1 : (season === "2") ? s2 : s3;
-                const range = jsonRanges.find(range => {
-                    const [start, end] = range.split('-');
-                    return Number(nationId) >= Number(start) && Number(nationId) <= Number(end);
-                });
-                const relevance = await fetch(`https://raw.githubusercontent.com/wesngu28/cardqueries/main/Card%20Lists/${season}_${range}.json`);
-                const relevantNations: Card[] = await relevance.json();
-                if (Object.keys(collectionCards).length > 0) {
-                    if (collectionCards.CARDS.COLLECTION.DECK.CARD) {
-                        const inCollection = collectionCards.CARDS.COLLECTION.DECK.CARD.some(
-                            (collectionCard: { CARDID: any }) => collectionCard.CARDID === Number(nationId)
-                        );
-                        return { ...relevantNations.find(nation => Number(nation.ID) === Number(nationId)), inCollection };
+            try {
+                let baseString = window.location.href.replace(`${process.env.NEXT_PUBLIC_SITE}/query`, 'https://api.nsupc.dev/cards/v1')
+                const collection = searchParams.get('collection')
+                let collectionCards: any = {}
+                if (collection) {
+                    if (!isNaN(parseInt(collection))) {
+                        collectionCards = await fetch('/api/collection', {
+                            body: `collection;collectionid=${collection}`,
+                            method: "POST"
+                        })
+                    } else {
+                        collectionCards = await fetch('/api/collection', {
+                            body: `deck;nationname=${collection}`,
+                            method: "POST"
+                        })
                     }
+                    collectionCards = await collectionCards.json()
                 }
-                return relevantNations.find(nation => Number(nation.ID) === Number(nationId))
-            }));
-            setCorrespondingJson(cardList as Card[])
-            setLastQuery(baseString.replace('https://api.nsupc.dev/cards/v1?', ''))
+                if (!collectionCards.error) {
+                    const getCards = await fetch('/api', {
+                        body: baseString,
+                        method: "POST"
+                    })
+                    const cardsJson = await getCards.json()
+                    const nationIds = Object.keys(cardsJson.nations)
+                    const cardList = await Promise.all(nationIds.map(async (nationId) => {
+                        const season = baseString?.split('?season=')[1][0];
+                        setSeason(season);
+                        const jsonRanges = (season === "1") ? s1 : (season === "2") ? s2 : s3;
+                        const range = jsonRanges.find(range => {
+                            const [start, end] = range.split('-');
+                            return Number(nationId) >= Number(start) && Number(nationId) <= Number(end);
+                        });
+                        const relevance = await fetch(`https://raw.githubusercontent.com/wesngu28/cardqueries/main/Card%20Lists/${season}_${range}.json`);
+                        const relevantNations: Card[] = await relevance.json();
+                        if (Object.keys(collectionCards).length > 0) {
+                            if (collectionCards.CARDS.COLLECTION && collectionCards.CARDS.COLLECTION.DECK.CARD) {
+                                const inCollection = collectionCards.CARDS.COLLECTION.DECK.CARD.some(
+                                    (collectionCard: { CARDID: any }) => collectionCard.CARDID === Number(nationId)
+                                );
+                                return { ...relevantNations.find(nation => Number(nation.ID) === Number(nationId)), inCollection };
+                            }
+                            if (collectionCards.CARDS.DECK && collectionCards.CARDS.DECK.CARD) {
+                                const inCollection = collectionCards.CARDS.DECK.CARD.some(
+                                    (collectionCard: { CARDID: any }) => collectionCard.CARDID === Number(nationId)
+                                );
+                                return { ...relevantNations.find(nation => Number(nation.ID) === Number(nationId)), inCollection };
+                            }
+                        }
+                        return relevantNations.find(nation => Number(nation.ID) === Number(nationId))
+                    }));
+                    setCorrespondingJson(cardList as Card[])
+                }
+            } catch (error: any) {
+                setErrorMessage("Error: " + error.message);
+            }
         }
         fetcher()
     }, [])
@@ -96,7 +117,7 @@ export default function Query() {
                     New Query
                 </button>
             </a>
-            {correspondingJson.length > 0 &&
+            {correspondingJson.length > 0 ?
                 <>
                     <button
                         onClick={handleDownload}
@@ -121,7 +142,8 @@ export default function Query() {
                             })}
                     </div>
                 </>
-            }
+                : <p className='text-lg font-bold mb-2'>Generating cards for {lastQuery}, please wait...</p>}
+            {errorMessage && <p className="text-red-500">{errorMessage}</p>}
         </main>
     )
 }

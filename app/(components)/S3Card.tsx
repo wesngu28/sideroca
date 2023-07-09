@@ -1,11 +1,12 @@
 import { Card } from "../(helpers)/models";
+import { banners } from "../(helpers)/specialBadges";
 import { Badges } from "./Badges";
 import { S2S3Description } from "./S2S3Description";
 
 export function S3Card({ card }: { card: Card }) {
     return (
         <a href={`https://www.nationstates.net/page=deck/card=${card.ID}/season=${card.SEASON}`} target="_blank" rel="noopener noreferrer">
-            <div className={`deckcard-container ${card.inCollection ? 'border-blue-400 border-1 border-solid' : 'border-red-600 border-1 border-solid'}`}>
+            <div className={`deckcard-container ${card.inCollection !== undefined ? card.inCollection ? 'border-blue-400 border-1 border-solid' : 'border-red-600 border-1 border-solid' : ""}`}>
                 <div className="deckcard deckcard-season-3" data-cardid={card.ID} data-season="3">
                     <figure className={`front deckcard-category-${card.CARDCATEGORY}`}>
                         <div className="s3-content">
@@ -26,8 +27,21 @@ export function S3Card({ card }: { card: Card }) {
                                 </div>
                             </div>
                             <div className="s3-mid deckcard-badges">
+                                <div className="role-badges">
+                                    {Object.keys(card.BADGES).map(badge => {
+                                        if (banners[badge]) {
+                                            let badge_img = banners[badge]
+                                            return (
+                                                <div key={badge} className="badge">
+                                                    <div className={badge_img}><i className="icon-flash"></i>{badge}</div>
+                                                </div>
+                                            )
+                                        }
+                                    }
+                                    )}
+                                </div>
                                 <div className="trophies">
-                                    <Badges cardBadges={Object.keys(card.BADGES)} cardTrophies={Object.keys(card.TROPHIES)} />
+                                    <Badges cardBadges={card.BADGES} cardTrophies={Object.keys(card.TROPHIES)} />
                                 </div>
                             </div>
                             <div className="s3-lower">

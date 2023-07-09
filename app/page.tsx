@@ -2,6 +2,7 @@
 import { FormEvent, MouseEvent, useEffect, useState } from 'react'
 import { MultipleInput, Input } from './(components)/Input'
 import { badges, flags, governments, trophies } from './categories'
+import "./base.css"
 
 export default function Home() {
 
@@ -142,7 +143,7 @@ export default function Home() {
             <Input suggestions='pretitle' />
           </div>
           <div className='grid grid-cols-2 m-2 w-72 sm:w-96 gap-4 items-center'>
-            <p>Collection</p>
+            <p>Collection/Deck</p>
             <Input suggestions='collection' />
           </div>
           <button data-umami-event="Search Query" className="w-max mt-4 h-10 mb-1 text-sm transition border-0 rounded appearance-none bg-blue-400 p-2 hover:bg-opacity-50" type='submit'>Search</button>
