@@ -55,20 +55,24 @@ export default function Query() {
             try {
                 let baseString = window.location.href.replace(`${process.env.NEXT_PUBLIC_SITE}/query`, 'https://api.nsupc.dev/cards/v1')
                 const collection = searchParams.get('collection')
+                const deck = searchParams.get('deck')
+                let reqText = ""
+                if (collection) reqText = `collection;collectionid=${collection}`
+                if (deck) reqText = `deck;nationname=${deck}`
                 let collectionCards: any = {}
-                if (collection) {
-                    let reqText = ""
-                    if (!isNaN(parseInt(collection))) reqText = `collection;collectionid=${collection}`
-                    else reqText =`deck;nationname=${collection}`
+                if (collection || deck) {
                     const cardsReq = await fetch(`https://www.nationstates.net/cgi-bin/api.cgi?q=cards+${reqText}`, {
-                        headers: {
-                            'User-Agent': "Kractero card queries"
-                        }
-                    })
-                    const cardsText = await cardsReq.text()
-                    const parser = new XMLParser()
-                    collectionCards = parser.parse(cardsText)
-                    if (!(collectionCards.CARDS.COLLECTION && collectionCards.CARDS.COLLECTION.DECK.CARD) && !(collectionCards.CARDS.DECK && collectionCards.CARDS.DECK.CARD)) throw Error
+                    headers: {
+                        'User-Agent': "Kractero card queries"
+                    }
+                })
+                const cardsText = await cardsReq.text()
+                const parser = new XMLParser()
+                collectionCards = parser.parse(cardsText)
+                if (!(collectionCards.CARDS.COLLECTION && collectionCards.CARDS.COLLECTION.DECK.CARD) 
+                    && !(collectionCards.CARDS.DECK && collectionCards.CARDS.DECK.CARD)) {
+                        throw new Error("Something is wrong with the collection or deck you gave")
+                    }
                 }
                 if (!collectionCards.error) {
                     const getCards = await fetch('/api', {

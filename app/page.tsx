@@ -7,17 +7,11 @@ import "./base.css"
 export default function Home() {
 
   const [queries, setQueries] = useState<string[]>([])
-  const [isPackResults, setIsPackResults] = useState(true)
-  
-  function switchToggle() {
-    setIsPackResults(!isPackResults)
-    localStorage.setItem('result', `${!isPackResults}`)
-  }
+  const [collectionType, setCollectionType] = useState(true)
 
   useEffect(() => {
     let queries = localStorage.getItem('queries')
     if (queries) setQueries(JSON.parse(queries))
-    setIsPackResults(localStorage.getItem('result') ? localStorage.getItem('result') === "true" ? true : false : true)
   }, [])
 
   async function servers(e: FormEvent<HTMLFormElement> | MouseEvent<HTMLButtonElement, globalThis.MouseEvent>, baseString?: string) {
@@ -68,15 +62,20 @@ export default function Home() {
       if (formData.get('motto')) baseString += `&motto=${formData.get('motto')}`
       if (formData.get('pretitle')) baseString += `&pretitle=${formData.get('pretitle')}`
       if (formData.get('exnation')) baseString += `&exnation`
-      if (formData.get('collection')) baseString += `&collection=${formData.get('collection')}`
+      if (formData.get('collection')) {
+        if (collectionType) {
+          baseString += `&collection=${formData.get('collection')}`
+        } else {
+          baseString += `&deck=${formData.get('collection')}`
+        }
+      }
 
       const querySet = new Set(queries)
       querySet.add(baseString.replace('https://api.nsupc.dev/cards/v1?', ''))
       localStorage.setItem('queries', JSON.stringify(Array.from(querySet)));
       setQueries(Array.from(querySet).reverse())
     }
-    if(isPackResults) window.location.href = `/query?${baseString}`
-    else window.location.href = `/query/lite?${baseString}`
+    window.location.href = `/query?${baseString}`
   }
 
   return (
@@ -142,20 +141,19 @@ export default function Home() {
             <p>Pretitle</p>
             <Input suggestions='pretitle' />
           </div>
-          <div className='grid grid-cols-2 m-2 w-72 sm:w-96 gap-4 items-center'>
-            <p>Collection/Deck</p>
+          <div className='grid grid-cols-2 m-2 w-72 sm:w-96 gap-4 items-center justify-center'>
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" value="" className="sr-only peer" checked={collectionType} onChange={() => setCollectionType(!collectionType)} />
+              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+              <span className="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300">
+                {collectionType ? 'Collection' : 'Deck'}
+              </span>
+            </label>
             <Input suggestions='collection' />
           </div>
           <button data-umami-event="Search Query" className="w-max mt-4 h-10 mb-1 text-sm transition border-0 rounded appearance-none bg-blue-400 p-2 hover:bg-opacity-50" type='submit'>Search</button>
         </form>
       </div>
-      <label className="relative inline-flex items-center cursor-pointer mt-6">
-        <input type="checkbox" value="" className="sr-only peer" checked={isPackResults} onChange={() => switchToggle()}/>
-        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-        <span className="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300">
-          {isPackResults ? 'Pack Results' : 'Lite Mode'}
-        </span>
-      </label>
       <div className='flex flex-col mt-16 gap-4'>
         <p className='text-lg font-bold mb-2'>Previous Queries</p>
         {queries.map(query => <button data-umami-event="Viewed Previous Query" key={query} onClick={(e) => servers(e, query)}>{query}</button>)}
