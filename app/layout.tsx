@@ -5,22 +5,16 @@ import { Inter } from 'next/font/google'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
-  title: 'Cards',
-  description: 'Get cards',
-  icons: {
-    icon: '/favicon.ico',
-    apple: '/apple-icon.png',
-    other: [
-      {
-        rel: 'icon',
-        url: '/favicon-16x16.png',
-      },
-      {
-        rel: 'icon',
-        url: '/favicon-32x32.png',
-      }
-    ],
-  },
+  title: 'Cards Queries',
+  description: 'Queries for the NationStates trading card game',
+  openGraph: {
+    title: 'Cards Queries',
+    description: 'Queries for the NationStates trading card game',
+    url: process.env.NEXT_PUBLIC_SITE,
+    siteName: 'Card Queries',
+    locale: 'en_US',
+    type: 'website',
+  }
 }
 
 export default function RootLayout({

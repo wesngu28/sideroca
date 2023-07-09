@@ -151,7 +151,8 @@ export default function Home() {
             </label>
             <Input suggestions='collection' />
           </div>
-          <button data-umami-event="Search Query" className="w-max mt-4 h-10 mb-1 text-sm transition border-0 rounded appearance-none bg-blue-400 p-2 hover:bg-opacity-50" type='submit'>Search</button>
+          <button style={{backgroundColor: "rgb(96 165 250 / var(--tw-bg-opacity))", padding: "0.5rem", marginTop: "1rem"}}
+          data-umami-event="Search Query" className="h-10 transition duration-500 border-0 rounded appearance-none bg-blue-400 p-2 hover:bg-opacity-50" type='submit'>Search</button>
         </form>
       </div>
       <div className='flex flex-col mt-16 gap-4'>

@@ -1538,6 +1538,9 @@ body {
     .deckcard {
         background-color: #fff;
     }
+    .deckcard-season-2 {
+        background-color: transparent;
+    }
   }
 
 img {
