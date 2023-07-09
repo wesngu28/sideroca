@@ -57,7 +57,7 @@ export default function Home() {
         if (baseString[baseString.length - 1] === ';') baseString = baseString.slice(0, baseString.length - 1)
       }
 
-      if (formData.get('category')) baseString += `&category=${formData.get('category')}`
+      if (formData.get('governments')) baseString += `&category=${formData.get('governments')}`
       if (formData.get('flag')) baseString += `&flag=${formData.get('flag')}`
       if (formData.get('motto')) baseString += `&motto=${formData.get('motto')}`
       if (formData.get('pretitle')) baseString += `&pretitle=${formData.get('pretitle')}`

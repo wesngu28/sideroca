@@ -130,7 +130,7 @@ export default function Query() {
                     >
                         Download Card List (CSV)
                     </button>
-                    <p className='text-lg font-bold mb-2'>{lastQuery}</p>
+                    <p className='dark:text-white text-lg font-bold mb-2'>{lastQuery}</p>
                     <div className='flex flex-wrap justify-center content-center'>
                         {correspondingJson
                             .sort((a, b) => {
@@ -147,7 +147,7 @@ export default function Query() {
                             })}
                     </div>
                 </>
-                : <p className='text-lg font-bold mb-2'>Generating cards for {lastQuery}, please wait...</p>}
+                : <p className='dark:text-white text-lg font-bold mb-2'>Generating cards for {lastQuery}, please wait...</p>}
             {errorMessage && <p className="text-red-500">{errorMessage}</p>}
         </main>
     )
