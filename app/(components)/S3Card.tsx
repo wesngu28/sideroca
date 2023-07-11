@@ -6,7 +6,7 @@ import { S2S3Description } from "./S2S3Description";
 export function S3Card({ card }: { card: Card }) {
     return (
         <a href={`https://www.nationstates.net/page=deck/card=${card.id}/season=${card.season}`} target="_blank" rel="noopener noreferrer">
-            <div className={`deckcard-container ${card.inCollection !== undefined ? card.inCollection ? 'border-blue-400 border-1 border-solid' : 'border-red-600 border-1 border-solid' : ""}`}>
+            <div className={`deckcard-container ${card.inCollection !== undefined ? card.inCollection ? 'border-blue-400 border-2 border-solid' : 'border-red-600 border-2 border-solid' : ""}`}>
                 <div className="deckcard deckcard-season-3" data-cardid={card.id} data-season="3">
                     <figure className={`front deckcard-category-${card.cardcategory}`}>
                         <div className="s3-content">

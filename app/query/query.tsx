@@ -84,9 +84,33 @@ export function Query() {
                         body: baseString,
                         method: "POST"
                     })
-                    const cardList = await getCards.json()
-                    console.log(cardList)
-                    setCorrespondingJson(cardList.cards as Card[])
+                    const cardsJson = await getCards.json()
+                    let cardList: Card[] = await Promise.all((cardsJson.cards as Card[]).map(async (nation) => {
+                        let inCollection = false;
+                      
+                        if (Object.keys(collectionCards).length > 0) {
+                          if (collectionCards.CARDS.COLLECTION && collectionCards.CARDS.COLLECTION.DECK.CARD) {
+                            inCollection = collectionCards.CARDS.COLLECTION.DECK.CARD.some(
+                              (collectionCard: { CARDID: any }) => collectionCard.CARDID === Number(nation.id)
+                            );
+                          } else if (collectionCards.CARDS.DECK && collectionCards.CARDS.DECK.CARD) {
+                            inCollection = collectionCards.CARDS.DECK.CARD.some(
+                              (collectionCard: { CARDID: any }) => collectionCard.CARDID === Number(nation.id)
+                            );
+                          }
+                        }
+                        return { ...nation, inCollection };
+                    }));
+                    cardList = cardList.sort((a, b) => {
+                        if (a.inCollection && !b.inCollection) return 1;
+                        if (!a.inCollection && b.inCollection) return -1;
+                        if (a.inCollection && b.inCollection) {
+                            if (a.id === b.id) return 0;
+                            return a.id > b.id ? 1 : -1;
+                        }
+                        return a.id > b.id ? 1 : -1;
+                    })
+                    setCorrespondingJson(cardList as Card[])
                 }
             } catch (error: any) {
                 setErrorMessage("Error: " + error.message);
@@ -128,16 +152,7 @@ export function Query() {
                                     {currentItems.map((card, i) => <p key={i}>{card.name}</p>)}
                                 </div>
                                 :
-                                currentItems.sort((a, b) => {
-                                    if (a.inCollection && !b.inCollection) return 1;
-                                    if (!a.inCollection && b.inCollection) return -1;
-                                    if (a.inCollection && b.inCollection) {
-                                      if (a.id === b.id) return 0;
-                                      return a.id > b.id ? 1 : -1;
-                                    }
-                                    return a.id > b.id ? 1 : -1;
-                                  })
-                                    .map(card =>
+                                currentItems.map(card =>
                                         card.season !== 3 ? (
                                             <S1S2Card key={card.id} card={card} />
                                         ) : (
