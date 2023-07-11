@@ -111,7 +111,7 @@ export function Query() {
                     </button>
                     <p className='dark:text-white text-lg font-bold mb-2'>{lastQuery}</p>
                     <div className='flex flex-col flex-wrap items-center gap-4 dark:text-white'>
-                        <ReactPaginate
+                        {/* <ReactPaginate
                             className='flex border border-solid border-gray-400 py-1 mt-4
                                 [&>li>a]:p-3 [&>li>a]:border-blue-800 [&>li>a]:bg-blue-400 [&>li>a]:border-solid [&>li>a]:border [&>li>a]:cursor-pointer'
                             breakLabel="..."
@@ -121,19 +121,22 @@ export function Query() {
                             pageCount={pageCount}
                             previousLabel="previous"
                             renderOnZeroPageCount={null}
-                        />
+                        /> */}
                         <div>
                             {!correspondingJson[0].motto ?
                                 <div className='flex flex-col dark:text-white'>
                                     {currentItems.map((card, i) => <p key={i}>{card.name}</p>)}
                                 </div>
                                 :
-                                currentItems
-                                    .sort((a, b) => {
-                                        if (a.inCollection && !b.inCollection) return 1;
-                                        if (!a.inCollection && b.inCollection) return -1;
-                                        return 0;
-                                    })
+                                correspondingJson.sort((a, b) => {
+                                    if (a.inCollection && !b.inCollection) return 1;
+                                    if (!a.inCollection && b.inCollection) return -1;
+                                    if (a.inCollection && b.inCollection) {
+                                      if (a.id === b.id) return 0;
+                                      return a.id > b.id ? 1 : -1;
+                                    }
+                                    return a.id > b.id ? 1 : -1;
+                                  })
                                     .map(card =>
                                         card.season !== 3 ? (
                                             <S1S2Card card={card} />
