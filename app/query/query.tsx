@@ -139,9 +139,9 @@ export function Query() {
                                   })
                                     .map(card =>
                                         card.season !== 3 ? (
-                                            <S1S2Card card={card} />
+                                            <S1S2Card key={card.id} card={card} />
                                         ) : (
-                                            <S3Card card={card} />
+                                            <S3Card key={card.id} card={card} />
                                         )
                                     )
                             }
