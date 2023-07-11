@@ -125,7 +125,7 @@ export function Query() {
                         <div>
                             {!correspondingJson[0].motto ?
                                 <div className='flex flex-col dark:text-white'>
-                                    {currentItems.map(card => <p>{card.name}</p>)}
+                                    {currentItems.map((card, i) => <p key={i}>{card.name}</p>)}
                                 </div>
                                 :
                                 currentItems
