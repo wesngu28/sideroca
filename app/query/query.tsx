@@ -1,12 +1,12 @@
 'use client'
 import { useEffect, useState } from 'react'
 import '../styles.css'
-import { s1, s2, s3 } from '../(helpers)/ranges'
 import { S3Card } from '../(components)/S3Card'
 import { S1S2Card } from '../(components)/S1S2Card'
 import { Card } from '../(helpers)/models'
 import { useSearchParams } from "next/navigation"
 import { XMLParser } from 'fast-xml-parser'
+import ReactPaginate from 'react-paginate';
 
 function downloadCSV(data: Card[], filename: string) {
     const csvData = convertJSONToCSV(data);
@@ -35,14 +35,19 @@ function convertJSONToCSV(jsonData: Card[]) {
     return csvRows.join('\n');
 }
 
-
 export function Query() {
-    const [season, setSeason] = useState<string>("")
     const [correspondingJson, setCorrespondingJson] = useState<Array<Card>>([])
     const [errorMessage, setErrorMessage] = useState<string>("");
     const searchParams = useSearchParams()
     const lastQuery = searchParams.toString()
-
+    const [itemOffset, setItemOffset] = useState(0);
+    const endOffset = itemOffset + 50;
+    const currentItems = correspondingJson.slice(itemOffset, endOffset);
+    const pageCount = Math.ceil(correspondingJson.length / 50);
+    const handlePageClick = (event: { selected: number }) => {
+        const newOffset = (event.selected * 50) % correspondingJson.length;
+        setItemOffset(newOffset);
+    };
     const handleDownload = () => {
         if (correspondingJson.length > 0) {
             const filename = `${lastQuery}.csv`;
@@ -53,7 +58,7 @@ export function Query() {
     useEffect(() => {
         async function fetcher() {
             try {
-                let baseString = window.location.href.replace(`${process.env.NEXT_PUBLIC_SITE}/query`, 'https://api.nsupc.dev/cards/v1')
+                let baseString = window.location.href.replace(`${process.env.NEXT_PUBLIC_SITE}/query`, 'https://nsfastapitest-production.up.railway.app/')
                 const collection = searchParams.get('collection')
                 const deck = searchParams.get('deck')
                 let reqText = ""
@@ -62,15 +67,15 @@ export function Query() {
                 let collectionCards: any = {}
                 if (collection || deck) {
                     const cardsReq = await fetch(`https://www.nationstates.net/cgi-bin/api.cgi?q=cards+${reqText}`, {
-                    headers: {
-                        'User-Agent': "Kractero card queries"
-                    }
-                })
-                const cardsText = await cardsReq.text()
-                const parser = new XMLParser()
-                collectionCards = parser.parse(cardsText)
-                if (!(collectionCards.CARDS.COLLECTION && collectionCards.CARDS.COLLECTION.DECK.CARD) 
-                    && !(collectionCards.CARDS.DECK && collectionCards.CARDS.DECK.CARD)) {
+                        headers: {
+                            'User-Agent': "Kractero card queries"
+                        }
+                    })
+                    const cardsText = await cardsReq.text()
+                    const parser = new XMLParser()
+                    collectionCards = parser.parse(cardsText)
+                    if (!(collectionCards.CARDS.COLLECTION && collectionCards.CARDS.COLLECTION.DECK.CARD)
+                        && !(collectionCards.CARDS.DECK && collectionCards.CARDS.DECK.CARD)) {
                         throw new Error("Something is wrong with the collection or deck you gave")
                     }
                 }
@@ -79,35 +84,9 @@ export function Query() {
                         body: baseString,
                         method: "POST"
                     })
-                    const cardsJson = await getCards.json()
-                    const nationIds = Object.keys(cardsJson.nations)
-                    const cardList = await Promise.all(nationIds.map(async (nationId) => {
-                        const season = baseString?.split('?season=')[1][0];
-                        setSeason(season);
-                        const jsonRanges = (season === "1") ? s1 : (season === "2") ? s2 : s3;
-                        const range = jsonRanges.find(range => {
-                            const [start, end] = range.split('-');
-                            return Number(nationId) >= Number(start) && Number(nationId) <= Number(end);
-                        });
-                        const relevance = await fetch(`https://raw.githubusercontent.com/wesngu28/cardqueries/main/Card%20Lists/${season}_${range}.json`);
-                        const relevantNations: Card[] = await relevance.json();
-                        if (Object.keys(collectionCards).length > 0) {
-                            if (collectionCards.CARDS.COLLECTION && collectionCards.CARDS.COLLECTION.DECK.CARD) {
-                                const inCollection = collectionCards.CARDS.COLLECTION.DECK.CARD.some(
-                                    (collectionCard: { CARDID: any }) => collectionCard.CARDID === Number(nationId)
-                                );
-                                return { ...relevantNations.find(nation => Number(nation.ID) === Number(nationId)), inCollection };
-                            }
-                            if (collectionCards.CARDS.DECK && collectionCards.CARDS.DECK.CARD) {
-                                const inCollection = collectionCards.CARDS.DECK.CARD.some(
-                                    (collectionCard: { CARDID: any }) => collectionCard.CARDID === Number(nationId)
-                                );
-                                return { ...relevantNations.find(nation => Number(nation.ID) === Number(nationId)), inCollection };
-                            }
-                        }
-                        return relevantNations.find(nation => Number(nation.ID) === Number(nationId))
-                    }));
-                    setCorrespondingJson(cardList as Card[])
+                    const cardList = await getCards.json()
+                    console.log(cardList)
+                    setCorrespondingJson(cardList.cards as Card[])
                 }
             } catch (error: any) {
                 setErrorMessage("Error: " + error.message);
@@ -131,20 +110,39 @@ export function Query() {
                         Download Card List (CSV)
                     </button>
                     <p className='dark:text-white text-lg font-bold mb-2'>{lastQuery}</p>
-                    <div className='flex flex-wrap justify-center content-center'>
-                        {correspondingJson
-                            .sort((a, b) => {
-                                if (a.inCollection && !b.inCollection) return 1;
-                                if (!a.inCollection && b.inCollection) return -1;
-                                return 0;
-                            })
-                            .map((card, i) => {
-                                return season !== "3" ? (
-                                    <S1S2Card card={card} />
-                                ) : (
-                                    <S3Card card={card} />
-                                );
-                            })}
+                    <div className='flex flex-col flex-wrap items-center gap-4 dark:text-white'>
+                        <ReactPaginate
+                            className='flex border border-solid border-gray-400 py-1 mt-4
+                                [&>li>a]:p-3 [&>li>a]:border-blue-800 [&>li>a]:bg-blue-400 [&>li>a]:border-solid [&>li>a]:border [&>li>a]:cursor-pointer'
+                            breakLabel="..."
+                            nextLabel="next"
+                            onPageChange={handlePageClick}
+                            pageRangeDisplayed={5}
+                            pageCount={pageCount}
+                            previousLabel="previous"
+                            renderOnZeroPageCount={null}
+                        />
+                        <div>
+                            {!correspondingJson[0].motto ?
+                                <div className='flex flex-col dark:text-white'>
+                                    {currentItems.map(card => <p>{card.name}</p>)}
+                                </div>
+                                :
+                                currentItems
+                                    .sort((a, b) => {
+                                        if (a.inCollection && !b.inCollection) return 1;
+                                        if (!a.inCollection && b.inCollection) return -1;
+                                        return 0;
+                                    })
+                                    .map(card =>
+                                        card.season !== 3 ? (
+                                            <S1S2Card card={card} />
+                                        ) : (
+                                            <S3Card card={card} />
+                                        )
+                                    )
+                            }
+                        </div>
                     </div>
                 </>
                 : <p className='dark:text-white text-lg font-bold mb-2'>Generating cards for {lastQuery}, please wait...</p>}

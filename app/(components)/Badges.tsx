@@ -42,7 +42,7 @@ export function Badges({ cardBadges, cardTrophies }: Props) {
             <div id="trophycabinet">
                 {cardTrophies.map((trophy, i) =>
                     <img key={trophy} src={`https://www.nationstates.net/images/trophies/${trophy.toLowerCase()}.png`} className="trophy inline"
-                        alt={`${trophy.toLowerCase} ranked ${cardTrophies[i]}`} />
+                        alt={`${trophy.toLowerCase()} ranked ${cardTrophies[i]}`} />
                 )}
             </div>
         </>

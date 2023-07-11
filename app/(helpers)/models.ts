@@ -1,16 +1,15 @@
 export interface Card {
-    ID: number
-    SEASON: number
-    NAME: string
-    TYPE: string
-    MOTTO: string
-    CATEGORY: string
-    REGION: string
-    FLAG: string
-    CARDCATEGORY: string
-    DESCRIPTION: string
-    BADGES: {[key: string]: string}
-    TROPHIES: {[key: string]: string}
-    inCollection?: boolean
-  }
-  
+  id: number
+  season: number
+  name: string
+  type: string
+  motto: string
+  category: string
+  region: string
+  flag: string
+  cardcategory: string
+  description: string
+  badges: {[key: string]: string} | string
+  trophies: {[key: string]: string} | string
+  inCollection?: boolean
+}

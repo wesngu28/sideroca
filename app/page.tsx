@@ -23,7 +23,7 @@ export default function Home() {
       season = formData.get('season') as string
       baseString = `season=${season}`
       if (formData.get('region')) baseString += `&region=${(formData.get('region') as string).replaceAll(' ', '_').toLowerCase()}`
-      if (formData.get('rarity')) baseString += `&rarity=${formData.get('rarity')}`
+      if (formData.get('cardcategory')) baseString += `&cardcategory=${formData.get('cardcategory')}`
 
       const trophyKeys = [...Array.from(formData.keys())].filter(key => key.includes('trophies') || key.includes('percent'));
       const badgeKeys = [...Array.from(formData.keys())].filter(key => key.includes('badges'));
@@ -62,6 +62,7 @@ export default function Home() {
       if (formData.get('motto')) baseString += `&motto=${formData.get('motto')}`
       if (formData.get('pretitle')) baseString += `&pretitle=${formData.get('pretitle')}`
       if (formData.get('exnation')) baseString += `&exnation`
+      if (formData.get('name')) baseString += `&name=${formData.get('name')}`
       if (formData.get('collection')) {
         if (collectionType) {
           baseString += `&collection=${formData.get('collection')}`
@@ -104,7 +105,7 @@ export default function Home() {
           </div>
           <div className='grid grid-cols-2 m-2 w-72 sm:w-96 gap-4 items-center'>
             <p>Filter Rarity</p>
-            <select name="rarity" className='text-black p-2'>
+            <select name="cardcategory" className='text-black p-2'>
               <option value={""}>All</option>
               <option value={"common"}>Common</option>
               <option value={"uncommon"}>Uncommon</option>
