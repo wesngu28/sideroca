@@ -143,12 +143,12 @@ export default function Home() {
         <p className='text-lg font-bold mb-2 text-center'>Previous Queries</p>
         {queries.map(query => {
           return (
-            <div className='grid-cols-[25px_auto_1fr] grid gap-4'>
+            <div key={query} className='grid-cols-[25px_auto_1fr] grid gap-4'>
               <img src="trash-small.png" onClick={() => {
                 setQueries(queries.filter(queryitem => queryitem !== query))
                 localStorage.setItem('queries', JSON.stringify(queries.filter(queryitem => queryitem !== query)))
               }}/>
-              <button data-umami-event="Viewed Previous Query" key={query} onClick={(e) => servers(e, query)}>{query.length > 45 ? query.slice(0, 45) + '...' : query}</button>
+              <button data-umami-event="Viewed Previous Query" onClick={(e) => servers(e, query)}>{query.length > 45 ? query.slice(0, 45) + '...' : query}</button>
             </div>
           )
         })}

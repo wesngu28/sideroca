@@ -16,7 +16,7 @@ export function Dropdown({ items, name }: Props) {
             </SelectTrigger>
             <SelectContent>
                 {items.map(item => {
-                    return <SelectItem value={item.toLowerCase()}>{item}</SelectItem>
+                    return <SelectItem key={item} value={item.toLowerCase()}>{item}</SelectItem>
                 })}
             </SelectContent>
         </Select>
