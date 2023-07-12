@@ -18,56 +18,62 @@ export default function Home() {
     if (queries) setQueries(JSON.parse(queries))
   }, [])
 
-  async function servers(e: FormEvent<HTMLFormElement> | MouseEvent<HTMLButtonElement, globalThis.MouseEvent>, baseString?: string) {
+  async function servers(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    if (!baseString) {
-      const form = e.target as HTMLFormElement;
-      const formData = new FormData(form);
-      let query = ["?"]
-      if (formData.get('season')) {
-        formData.get('season') === "season 1" ? query.push(`season=1`) : formData.get('season') === "season 2" ? query.push(`season=2`) : formData.get('season') === "season 3" ? query.push(`season=3`) : ""
-      }
-      if (formData.get('region')) query.push(`region=${(formData.get('region') as string).replaceAll(' ', '_').toLowerCase()}`)
-      if (formData.get('cardcategory')) query.push(`cardcategory=${formData.get('cardcategory')}`)
-
-      const trophyKeys = formData.get('trophies') ? [...Array.from(formData.keys())].filter(key => key.includes('trophies') || key.includes('%')) : [];
-      const badgeKeys = formData.get('badges') ? [...Array.from(formData.keys())].filter(key => key.includes('badges')) : [];
-      if (trophyKeys.length > 0) {
-        let trophies = ["trophies="]
-        for (const key of trophyKeys) {
-          if (key.includes('trophies')) trophies.push((formData.get(key) as string)!.replaceAll(' ', '_').toLowerCase())
-          if (key.includes('%')) trophies.push(`-${(formData.get(key) as string)}`)
-        }
-        query.push(trophies.join(',').replace(',', '').replaceAll(',-', '-'))
-      }
-
-      if (badgeKeys.length > 0) {
-        let badges = ["badges="]
-        for (const key of badgeKeys) {
-          const badge = (formData.get(key) as string)!.replaceAll(' ', '_').toLowerCase();
-          if (badge) badges.push(`${badge}`)
-        }
-        query.push(badges.join(',').replace(',', ''))
-      }
-
-      if (formData.get('category'))  query.push(`category=${formData.get('category')}`)
-      if (formData.get('flag'))  query.push(`flag=${formData.get('flag')}`)
-      if (formData.get('motto'))  query.push(`motto=${formData.get('motto')}`)
-      if (formData.get('pretitle'))  query.push(`pretitle=${formData.get('pretitle')}`)
-      if (formData.get('exnation'))  query.push(`exnation`)
-      if (formData.get('name'))  query.push(`name=${formData.get('name')}`)
-      if (formData.get('collection')) {
-        if (collectionType) {
-           query.push(`collection=${formData.get('collection')}`)
-        } else {
-           query.push(`deck=${formData.get('collection')}`)
-        }
-      }
-      baseString = query.join('&').replace('&', '')
-      queries.unshift(baseString)
+    const form = e.target as HTMLFormElement;
+    const formData = new FormData(form);
+    if (formData.get('manual')) {
+      const baseString = formData.get('manual')?.toString()
+      queries.unshift(baseString!)
       localStorage.setItem('queries', JSON.stringify(queries));
-      setQueries(Array.from(queries).reverse())
+      setQueries(Array.from(queries))
+      window.location.href = `/query?${formData.get('manual')?.toString()}`
+      return
     }
+    let query = ["?"]
+    if (formData.get('season')) {
+      formData.get('season') === "season 1" ? query.push(`season=1`) : formData.get('season') === "season 2" ? query.push(`season=2`) : formData.get('season') === "season 3" ? query.push(`season=3`) : ""
+    }
+    if (formData.get('region')) query.push(`region=${(formData.get('region') as string).replaceAll(' ', '_').toLowerCase()}`)
+    if (formData.get('cardcategory')) query.push(`cardcategory=${formData.get('cardcategory')}`)
+
+    const trophyKeys = formData.get('trophies') ? [...Array.from(formData.keys())].filter(key => key.includes('trophies') || key.includes('%')) : [];
+    const badgeKeys = formData.get('badges') ? [...Array.from(formData.keys())].filter(key => key.includes('badges')) : [];
+    if (trophyKeys.length > 0) {
+      let trophies = ["trophies="]
+      for (const key of trophyKeys) {
+        if (key.includes('trophies')) trophies.push((formData.get(key) as string)!.replaceAll(' ', '_').toLowerCase())
+        if (key.includes('%')) trophies.push(`-${(formData.get(key) as string)}`)
+      }
+      query.push(trophies.join(',').replace(',', '').replaceAll(',-', '-'))
+    }
+
+    if (badgeKeys.length > 0) {
+      let badges = ["badges="]
+      for (const key of badgeKeys) {
+        const badge = (formData.get(key) as string)!.replaceAll(' ', '_').toLowerCase();
+        if (badge) badges.push(`${badge}`)
+      }
+      query.push(badges.join(',').replace(',', ''))
+    }
+
+    if (formData.get('category'))  query.push(`category=${formData.get('category')}`)
+    if (formData.get('flag'))  query.push(`flag=${formData.get('flag')}`)
+    if (formData.get('motto'))  query.push(`motto=${formData.get('motto')}`)
+    if (formData.get('pretitle'))  query.push(`pretitle=${formData.get('pretitle')}`)
+    if (formData.get('exnation'))  query.push(`exnation`)
+    if (formData.get('name'))  query.push(`name=${formData.get('name')}`)
+    if (formData.get('collection')) {
+      if (collectionType) {
+          query.push(`collection=${formData.get('collection')}`)
+      } else {
+          query.push(`deck=${formData.get('collection')}`)
+      }
+    }
+    let baseString = query.join('&').replace('&', '')
+    queries.unshift(baseString)
+    localStorage.setItem('queries', JSON.stringify(queries));
+    setQueries(Array.from(queries))
     window.location.href = `/query${baseString}`
   }
 
@@ -76,11 +82,13 @@ export default function Home() {
       <div className='mt-2 mb-6 text-center'>
         <h1 className="text-7xl my-2 tracking-tight">Card <span className='text-blue-700'>Queries</span></h1>
       </div>
-      <div className="tailwind-preflight relative flex">
+      <div className="tailwind-preflight relative flex flex-col">
         <form className='flex flex-col items-center' onSubmit={(e) => servers(e)} name='card'>
+          <p className='mb-2'>Enter your query manually, or fill out the form.</p>
+          <Input name="manual" />
           <div className='grid grid-cols-2 m-2 w-72 sm:w-96 gap-4 items-center'>
             <p>Filter Season</p>
-            <Dropdown name='season' items={["All", "Season 1", "Season 2", "Season 3"]} />
+            <Dropdown name='season' items={["All", "Season 1", "Season 2", "Season 3"]} defindex={3} />
           </div>
           <div className='grid grid-cols-2 m-2 w-72 sm:w-96 gap-4 items-center'>
             <p>Pick Trophies</p>
@@ -96,7 +104,7 @@ export default function Home() {
           </div>
           <div className='grid grid-cols-2 m-2 w-72 sm:w-96 gap-4 items-center'>
             <p>Filter Rarity</p>
-            <Dropdown name='cardcategory' items={["All", "Common", "Uncommon", "Rare", "Ultra-Rare", "Epic", "Legendary"]} />
+            <Dropdown name='cardcategory' items={["All", "Common", "Uncommon", "Rare", "Ultra-Rare", "Epic", "Legendary"]} defindex={0} />
           </div>
           <div className='grid grid-cols-2 m-2 w-72 sm:w-96 gap-4 items-center'>
             <p>Region</p>
@@ -141,14 +149,16 @@ export default function Home() {
       </div>
       <div className='tailwind-preflight flex flex-col mt-16 gap-4'>
         <p className='text-lg font-bold mb-2 text-center'>Previous Queries</p>
-        {queries.map(query => {
+        {queries.map((query, i) => {
           return (
-            <div key={query} className='grid-cols-[25px_auto_1fr] grid gap-4'>
+            <div key={query + i} className='grid-cols-[25px_auto_1fr] grid gap-4'>
               <img src="trash-small.png" onClick={() => {
                 setQueries(queries.filter(queryitem => queryitem !== query))
                 localStorage.setItem('queries', JSON.stringify(queries.filter(queryitem => queryitem !== query)))
               }}/>
-              <button data-umami-event="Viewed Previous Query" onClick={(e) => servers(e, query)}>{query.length > 45 ? query.slice(0, 45) + '...' : query}</button>
+              <a className='hover:text-blue-700' data-umami-event="Viewed Previous Query" 
+              onClick={() => window.location.href = `/query?${query}`}>{query.length > 45 ? query.slice(0, 45) + '...' : query}
+              </a>
             </div>
           )
         })}

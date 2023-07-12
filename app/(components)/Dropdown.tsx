@@ -6,13 +6,13 @@ import {
     SelectValue,
   } from "@/components/ui/select"
   
-interface Props { items: string[], name: string }
+interface Props { items: string[], name: string, defindex: number }
 
-export function Dropdown({ items, name }: Props) {
+export function Dropdown({ items, name, defindex }: Props) {
     return (
         <Select name={name}>
             <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder={items[0]} />
+                <SelectValue placeholder={defindex} />
             </SelectTrigger>
             <SelectContent>
                 {items.map(item => {
