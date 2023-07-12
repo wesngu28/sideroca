@@ -7,6 +7,7 @@ import { Card } from '../(helpers)/models'
 import { useSearchParams } from "next/navigation"
 import { XMLParser } from 'fast-xml-parser'
 import ReactPaginate from 'react-paginate';
+import { Button } from '@/components/ui/button'
 
 function downloadCSV(data: Card[], filename: string) {
     const csvData = convertJSONToCSV(data);
@@ -86,7 +87,7 @@ export function Query() {
                     })
                     const cardsJson = await getCards.json()
                     let cardList: Card[] = await Promise.all((cardsJson.cards as Card[]).map(async (nation) => {
-                        let inCollection = false;
+                        let inCollection = undefined;
                       
                         if (Object.keys(collectionCards).length > 0) {
                           if (collectionCards.CARDS.COLLECTION && collectionCards.CARDS.COLLECTION.DECK.CARD) {
@@ -121,29 +122,30 @@ export function Query() {
     return (
         <main className="flex min-h-screen flex-col items-center p-12">
             <a href="/">
-                <button data-umami-event="Make New Query" className="w-max mt-4 h-10 text-sm transition duration-500 border-0 rounded appearance-none bg-blue-400 p-2 hover:bg-opacity-50 mb-8">
+                <Button variant={"outline"} 
+                data-umami-event="Make New Query" className="text-white transition duration-500 bg-blue-700 hover:bg-blue-600 mb-8">
                     New Query
-                </button>
+                </Button>
             </a>
             {correspondingJson.length > 0 ?
                 <>
-                    <button
+                    <Button variant={'outline'}
                         onClick={handleDownload}
-                        className="w-max mt-4 h-10 text-sm transition duration-500 border-0 rounded appearance-none bg-blue-400 p-2 hover:bg-opacity-50 mb-8"
+                        className="text-white transition duration-500 bg-blue-700 hover:bg-blue-600 mb-8"
                     >
                         Download Card List (CSV)
-                    </button>
+                    </Button>
                     <p className='dark:text-white text-lg font-bold mb-2'>{lastQuery}</p>
                     <div className='flex flex-col flex-wrap items-center gap-4 dark:text-white'>
                         <ReactPaginate
-                            className='flex border border-solid border-gray-400 py-1 mt-4
-                                [&>li>a]:p-3 [&>li>a]:border-blue-800 [&>li>a]:bg-blue-400 [&>li>a]:border-solid [&>li>a]:border [&>li>a]:cursor-pointer'
+                            className='flex py-1 mt-4 mb-8 text-white
+                                [&>li>a]:p-3 [&>li>a]:border-gray-800 [&>li>a]:bg-blue-700 [&>li>a]:border-solid [&>li>a]:border [&>li>a]:cursor-pointer'
                             breakLabel="..."
-                            nextLabel="next"
+                            nextLabel="Next"
                             onPageChange={handlePageClick}
                             pageRangeDisplayed={5}
                             pageCount={pageCount}
-                            previousLabel="previous"
+                            previousLabel="Previous"
                             renderOnZeroPageCount={null}
                         />
                         <div>
