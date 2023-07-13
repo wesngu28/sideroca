@@ -1,15 +1,43 @@
-from fastapi import FastAPI, Depends
-from pydantic import BaseModel
-from sqlalchemy import or_, and_
+from fastapi import FastAPI, Depends, Request
+from pydantic import BaseModel, create_model
+from sqlalchemy import or_, and_, select
 from sqlalchemy.orm import Session
 from database import SessionLocal, engine
 import models
 from typing import Union
+import redis
+from redis import Redis
+from cache import pool
+import json
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
+import hashlib
 import re
 
 models.Base.metadata.create_all(bind=engine)
 
+def get_limiter_key(request: Request):
+    current_key = request.scope.get("client")[0]
+    request_headers = request.scope.get("headers")
+    limiter_prefix = request.scope.get("root_path") + request.scope.get("path") + ":"
+
+    for headers in request_headers:
+        if headers[0].decode() == "authorization":
+            current_key = headers[1].decode()
+            break
+        if headers[0].decode() in ("user-agent", "x-real-ip"):
+            current_key += headers[1].decode()
+
+    hash_object = hashlib.sha256(current_key.encode())
+    current_key = hash_object.hexdigest()
+    limiter_key = re.sub(r":{1,}", ":", re.sub(r"/{1,}", ":", limiter_prefix + current_key))
+    return limiter_key
+
+limiter = Limiter(key_func=get_limiter_key, storage_uri="redis://localhost:6379/1")
 app = FastAPI()
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 def get_db():
     db = SessionLocal()
@@ -17,6 +45,9 @@ def get_db():
         yield db
     finally:
         db.close()
+
+def get_redis():
+  return redis.Redis(connection_pool=pool)
 
 class CardSchema(BaseModel):
     id: int
@@ -33,8 +64,11 @@ class CardSchema(BaseModel):
     trophies: Union[list, dict]
 
 @app.get("/")
-def index(
+@limiter.limit("15/minute")
+async def index(
+    request: Request,
     db: Session = Depends(get_db),
+    cache: Union[Redis, None] = Depends(get_redis),
     season: int | None = None,
     name: str | None = None,
     type: str | None = None,
@@ -47,85 +81,90 @@ def index(
     trophies: str | None = None,
     mode: str | None = None
 ):
-
-    if all(value is None for value in (season, name, type, motto, category, region, flag, cardcategory, badges, trophies)):
+    if all(value is None for value in request.query_params.keys()):
         return {"cards": []}
-
-    names = name.split(",") if name else []
-    formatted_names = [~models.Card.name.ilike(f"%{name[1:].replace(' ', '_')}%") if name is not None and name.startswith('!') else models.Card.name.ilike(f"%{name.replace(' ', '_')}%") if name is not None else True for name in names]
-    types = type.split(",") if type else []
-    formatted_types = [~models.Card.type.ilike(f"%{type[1:].replace(' ', '_')}%") if type is not None and type.startswith('!') else models.Card.type.ilike(f"%{type.replace(' ', '_')}%") if type is not None else True for type in types]
-    
-    trophies = trophies.split(",") if trophies else []
-
-    if len(trophies) == 1 and trophies[0] == 'sans':
-        trophies_query = models.Card.trophies == {}
-        or_trophies_queries = []
-        and_trophies_queries = []
+    cached_response = cache.get(str(request.query_params))
+    if cached_response:
+        return json.loads(cached_response)
     else:
-        or_trophies = []
-        and_trophies = []
-        for trophy in trophies:
-            elements = trophy.split("|")
-            or_trophies.append(elements[0])
-            if len(elements) > 1:
-                and_trophies.append(elements[1])
-        format_or_trophies = [' '.join(word.upper() for word in trophy.split('_')) for trophy in or_trophies]
-        format_and_trophies = [' '.join(word.upper() for word in trophy.split('_')) for trophy in and_trophies]
-        or_trophies_queries = [models.Card.trophies.comparator.contains([trophy[1:]]) if trophy.startswith('!') else models.Card.trophies[trophy] for trophy in format_or_trophies]
-        and_trophies_queries = [models.Card.trophies.comparator.contains([trophy[1:]]) if trophy.startswith('!') else models.Card.trophies[trophy] for trophy in format_and_trophies]
-        trophies_query = None
-
-    badges = badges.split(",") if badges else []
-
-    if len(badges) == 1 and badges[0] == 'sans':
-        badges_query = models.Card.badges == {}
+        ilike_queries = []
+        sans_queries = []
         or_badges_queries = []
         and_badges_queries = []
+        match_queries = []
+        for param in request.query_params:
+            if (param in ('badges', 'trophies')):
+                value = request.query_params[param]
+                values = value.split(",") if value else []
+                if len(values) == 1 and "sans" in values:
+                    sans_queries.append(getattr(models.Card, param) == {})
+                else:
+                    or_badges = []
+                    and_badges = []
+                    for value in values:
+                        elements = value.split("|")
+                        if len(values) == 1:
+                            and_badges.extend(elements)
+                            break
+                        or_badges.append(elements[0])
+                        if len(elements) > 1:
+                            and_badges.append(elements[1])
+                    format_or_badges = [' '.join(word.capitalize() if param == 'badges' else word.upper() for word in badge.split('_')) for badge in or_badges]
+                    format_and_badges = [' '.join(word.capitalize() if param == 'badges' else word.upper() for word in badge.split('_')) for badge in and_badges]
+                    or_badges_queries = [getattr(models.Card, param).comparator.contains([badge[1:]]) if badge.startswith('!') else getattr(models.Card, param)[badge] for badge in format_or_badges]
+                    and_badges_queries = [getattr(models.Card, param).comparator.contains([badge[1:]]) if badge.startswith('!') else getattr(models.Card, param)[badge] for badge in format_and_badges]
+
+            if param in ('name', 'type', 'region', 'flag', 'motto'):
+                value = request.query_params[param]
+                values = value.split(",") if value else []
+                formatted_values = [~getattr(models.Card, param).ilike(f"%{value[1:].replace(' ', '_')}%") if value is not None and value.startswith('!') else getattr(models.Card, param).ilike(f"%{value.replace(' ', '_')}%") if value is not None else True for value in values]
+                match_queries.append(or_(*formatted_values) if formatted_values is not None else True)
+
+            if param in ('category', 'cardcategory'):
+                value = request.query_params[param]
+                values = value.split(",") if value else []
+                if param == 'category':
+                    values = [' '.join(word.capitalize() for word in value.split('_')) for value in values]
+                formatted_values = [~getattr(models.Card, param) == value[1:] if value is not None and value.startswith('!') else getattr(models.Card, param) == value if value is not None else True for value in values]
+                if param == 'category':
+                    match_queries.append(and_(*formatted_values))
+                else:
+                    match_queries.append(or_(*formatted_values))
+
+        query_finales = db.query(models.Card).filter(
+                season is None or models.Card.season == str(season),
+                *ilike_queries if ilike_queries is not None else True,
+                *match_queries if ilike_queries is not None else True,
+                *sans_queries if sans_queries is not None else True,
+                or_(*or_badges_queries) if or_badges_queries is not None else True,
+                *and_badges_queries if and_badges_queries is not None else True,
+        )
+
+        if (mode):
+            res_names = {"cards": [{"id": card.id, "name": card.name} for card in query_finales.with_entities(models.Card.name, models.Card.id).all()]}
+            cache.set(str(request.query_params), json.dumps(res_names))
+            cache.expire(str(request.query_params), 86400)
+            return res_names
+        else:
+            card_dicts = {"cards": [{key: getattr(card, key) for key in card.__table__.columns.keys()} for card in query_finales.all()] }
+            cache.set(str(request.query_params), json.dumps(card_dicts))
+            cache.expire(str(request.query_params), 86400)
+            return card_dicts
+        
+@app.post("/")
+@limiter.limit("15/minute")
+async def index(request: Request, db: Session = Depends(get_db), cache: Union[Redis, None] = Depends(get_redis)):
+    cards_in_collection = await request.json()
+    cached_response = cache.get(str(request.query_params))
+    if cached_response:
+        return json.loads(cached_response)
     else:
-        or_badges = []
-        and_badges = []
-        for badge in badges:
-            elements = badge.split("|")
-            or_badges.append(elements[0])
-            if len(elements) > 1:
-                and_badges.append(elements[1])
-        formatted_badges = [' '.join(word.capitalize() for word in badge.split('_')) for badge in badges]
-        format_or_badges = [' '.join(word.capitalize() for word in badge.split('_')) for badge in or_badges]
-        format_and_badges = [' '.join(word.capitalize() for word in badge.split('_')) for badge in and_badges]
-        badges_query = [ models.Card.badges.comparator.contains([badge[1:]]) if badge.startswith('!') else models.Card.badges[badge] for badge in formatted_badges ]
-        or_badges_queries = [ models.Card.badges.comparator.contains([badge[1:]]) if badge.startswith('!') else models.Card.badges[badge] for badge in format_or_badges ]
-        and_badges_queries = [ models.Card.badges.comparator.contains([badge[1:]]) if badge.startswith('!') else models.Card.badges[badge] for badge in format_and_badges ]
-        badges_query = None
-
-    categories = category.split(",") if category else []
-    formatted_category = [' '.join(word.capitalize() for word in category.split('_')) for category in categories]
-    categories_query = [~(models.Card.category == category[1:]) if category is not None and category.startswith('!') else models.Card.category == category if category is not None else True for category in formatted_category]
-    regions = region.split(",") if region else []
-    regions_query = [~models.Card.region.ilike(f"%{region[1:].replace(' ', '_')}%") if region is not None and region.startswith('!') else models.Card.region.ilike(f"%{region.replace(' ', '_')}%") if region is not None else True for region in regions]
-    flags = flag.split(",") if flag else []
-    flags_query = [~models.Card.flag.ilike(f"%{flag[1:].replace(' ', '_')}%") if flag is not None and flag.startswith('!') else models.Card.flag.ilike(f"%{flag.replace(' ', '_')}%") if flag is not None else True for flag in flags]
-    cardcategories = cardcategory.split(',') if cardcategory else []
-    cardcategories_query = [~(models.Card.cardcategory == cardcategory[1:]) if cardcategory is not None and cardcategory.startswith('!') else models.Card.cardcategory == cardcategory if cardcategory is not None else True for cardcategory in cardcategories]
-    
-    query_finales = db.query(models.Card).filter(
-            season is None or models.Card.season == str(season),
-            or_(*formatted_names) if formatted_names is not None else True,
-            or_(*formatted_types) if formatted_types is not None else True,
-            ~models.Card.motto.ilike(f"%{motto[1:].replace(' ', '_')}%") if motto is not None and motto.startswith('!') else models.Card.motto.ilike(f"%{motto.replace(' ', '_')}%") if motto is not None else True,
-            and_(*categories_query) if categories_query is not None else True,
-            or_(*regions_query) if regions_query is not None else True,
-            or_(*flags_query) if flags_query is not None else True,
-            or_(*cardcategories_query) if cardcategories_query is not None else True,
-            badges_query if badges_query is not None else True,
-            or_(*or_badges_queries) if or_badges_queries is not None else True,
-            *and_badges_queries if and_badges_queries is not None else True,
-            trophies_query if trophies_query is not None else True,
-            or_(*or_trophies_queries) if or_trophies_queries is not None else True,
-            *and_trophies_queries if and_trophies_queries is not None else True,
-    )
-
-    if (mode):
-        return {"cards": [{"id": card.id, "name": card.name} for card in query_finales.with_entities(models.Card.name, models.Card.id).all()]}
-    else: 
-        return {"cards": query_finales.all()}
+        query_finales = []
+        for card in cards_in_collection:
+            query = db.query(models.Card).filter(
+                models.Card.id == card['CARDID'],
+                models.Card.season == card['SEASON'],
+                models.Card.cardcategory == card['CATEGORY']
+            )
+            query_finales.extend(query.all())
+        return query_finales
