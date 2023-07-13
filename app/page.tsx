@@ -4,15 +4,15 @@ import { FormEvent, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { badges, flags, governments, trophies } from './(helpers)/categories'
 import { trophiesDict } from './(helpers)/categories'
-import { MultipleInput } from '../../queryfrontend/app/(components)/Input'
 import { Dropdown } from './(components)/Dropdown'
 import { ComboBox } from './(components)/ComboBox'
 import { Input } from '@/components/ui/input'
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
-import { Label } from "../../queryfrontend/components/ui/label"
 import FormItem from './(components)/FormItem'
 import { Clipboard, Trash } from 'lucide-react'
+import { MultipleInput } from './(components)/Input'
+import { Label } from '@/components/ui/label'
 
 export default function Home() {
 
