@@ -1,5 +1,5 @@
 import { Card } from "../(helpers)/models";
-import { banners } from "../(helpers)/specialBadges";
+import { banners } from "../(helpers)/categories";
 import { Badges } from "./Badges";
 import { S2S3Description } from "./S2S3Description";
 

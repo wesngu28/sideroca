@@ -1,162 +1,160 @@
 "use client"
-import { FormEvent, MouseEvent, useEffect, useState } from 'react'
-import { MultipleInput } from './(components)/Input'
-import { badges, flags, governments, trophies } from './categories'
-import "./base.css"
+
+import { FormEvent, useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { badges, flags, governments, trophies } from './(helpers)/categories'
+import { trophiesDict } from './(helpers)/categories'
+import { MultipleInput } from '../../queryfrontend/app/(components)/Input'
 import { Dropdown } from './(components)/Dropdown'
 import { ComboBox } from './(components)/ComboBox'
 import { Input } from '@/components/ui/input'
 import { Button } from "@/components/ui/button"
+import { Switch } from "@/components/ui/switch"
+import { Label } from "../../queryfrontend/components/ui/label"
+import FormItem from './(components)/FormItem'
+import { Clipboard, Trash } from 'lucide-react'
 
 export default function Home() {
 
   const [queries, setQueries] = useState<string[]>([])
-  const [collectionType, setCollectionType] = useState(true)
+  const [collectionType, setCollectionType] = useState("Collection")
+  const [render, setRender] = useState("Cards")
+
+  const router = useRouter()
 
   useEffect(() => {
     let queries = localStorage.getItem('queries')
     if (queries) setQueries(JSON.parse(queries))
   }, [])
 
-  async function servers(e: FormEvent<HTMLFormElement>) {
+  async function makeRequest(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
     const form = e.target as HTMLFormElement;
     const formData = new FormData(form);
-    if (formData.get('manual')) {
-      const baseString = formData.get('manual')?.toString()
-      queries.unshift(baseString!)
-      localStorage.setItem('queries', JSON.stringify(queries));
-      setQueries(Array.from(queries))
-      window.location.href = `/query?${formData.get('manual')?.toString()}`
-      return
-    }
     let query = ["?"]
-    if (formData.get('season')) {
-      formData.get('season') === "season 1" ? query.push(`season=1`) : formData.get('season') === "season 2" ? query.push(`season=2`) : formData.get('season') === "season 3" ? query.push(`season=3`) : ""
-    }
-    if (formData.get('region')) query.push(`region=${(formData.get('region') as string).replaceAll(' ', '_').toLowerCase()}`)
-    if (formData.get('cardcategory')) query.push(`cardcategory=${formData.get('cardcategory')}`)
-
-    const trophyKeys = formData.get('trophies') ? [...Array.from(formData.keys())].filter(key => key.includes('trophies') || key.includes('%')) : [];
-    const badgeKeys = formData.get('badges') ? [...Array.from(formData.keys())].filter(key => key.includes('badges')) : [];
-    if (trophyKeys.length > 0) {
-      let trophies = ["trophies="]
-      for (const key of trophyKeys) {
-        if (key.includes('trophies')) trophies.push((formData.get(key) as string)!.replaceAll(' ', '_').toLowerCase())
-        if (key.includes('%')) trophies.push(`-${(formData.get(key) as string)}`)
+    for (const [key, value] of Array.from(formData.entries())) {
+      if (value) {
+        if (key === 'manual') {
+          queries.unshift(value.toString())
+          localStorage.setItem('queries', JSON.stringify(queries))
+          setQueries(queries)
+          router.push(`/query?${formData.get('manual')?.toString()}`)
+          return
+        }
+        if (key === 'season') value === 'all' ? "" : query.push(value.toString().replace(' ', '='))
+        if (key === 'region') query.push(`region=${value.toString().replaceAll(' ', '_').toLowerCase()}`)
+        if (key === 'cardcategory') query.push(`cardcategory=${value}`)
+        if (key === 'trophies') {
+          const trophyKeys = value ? [...Array.from(formData.keys())].filter(key => key.includes('trophies') || key.includes('%')) : [];
+          if (trophyKeys.length > 0) {
+            let trophies = ["trophies="]
+            for (const key of trophyKeys) {
+              if (key.includes('trophies')) trophies.push(trophiesDict[formData.get(key)! as string].replaceAll(' ', '_'))
+              if (key.includes('%')) trophies.push(`-${(formData.get(key) as string)}`)
+            }
+            query.push(trophies.join(',').replace(',', '').replaceAll(',-', '-'))
+          }
+        }
+        if (key === 'badges') {
+          const badgeKeys = formData.get('badges') ? [...Array.from(formData.keys())].filter(key => key.includes('badges')) : [];
+          if (badgeKeys.length > 0) {
+            let badges = ["badges="]
+            for (const key of badgeKeys) {
+              const badge = (formData.get(key) as string)!.replaceAll(' ', '_').toLowerCase();
+              if (badge) badges.push(`${badge}`)
+            }
+            query.push(badges.join(',').replace(',', ''))
+          }
+        }
+        if (key === 'category') query.push(`category=${value.toString().replaceAll(' ', '_').toLowerCase()}}`)
+        if (key === 'flag') query.push(`flag=${value}`)
+        if (key === 'motto') query.push(`motto=${value}`)
+        if (key === 'type') query.push(`type=${value}`)
+        if (key === 'exnation') query.push(`exnation`)
+        if (key === 'name') query.push(`name=${value}`)
+        if (key === 'collection') query.push(`${collectionType.toLowerCase()}=${value}`)
       }
-      query.push(trophies.join(',').replace(',', '').replaceAll(',-', '-'))
     }
 
-    if (badgeKeys.length > 0) {
-      let badges = ["badges="]
-      for (const key of badgeKeys) {
-        const badge = (formData.get(key) as string)!.replaceAll(' ', '_').toLowerCase();
-        if (badge) badges.push(`${badge}`)
-      }
-      query.push(badges.join(',').replace(',', ''))
-    }
-
-    if (formData.get('category'))  query.push(`category=${formData.get('category')}`)
-    if (formData.get('flag'))  query.push(`flag=${formData.get('flag')}`)
-    if (formData.get('motto'))  query.push(`motto=${formData.get('motto')}`)
-    if (formData.get('pretitle'))  query.push(`pretitle=${formData.get('pretitle')}`)
-    if (formData.get('exnation'))  query.push(`exnation`)
-    if (formData.get('name'))  query.push(`name=${formData.get('name')}`)
-    if (formData.get('collection')) {
-      if (collectionType) {
-          query.push(`collection=${formData.get('collection')}`)
-      } else {
-          query.push(`deck=${formData.get('collection')}`)
-      }
-    }
     let baseString = query.join('&').replace('&', '')
     queries.unshift(baseString)
     localStorage.setItem('queries', JSON.stringify(queries));
     setQueries(Array.from(queries))
-    window.location.href = `/query${baseString}`
+    if (formData.get('mode') === 'on') baseString += "&mode=name"
+    router.push(`/query${baseString}`)
   }
 
   return (
     <main className="flex min-h-screen flex-col items-center p-12">
-      <div className='mt-2 mb-6 text-center'>
+      <div className='mt-2 mb-10 text-center'>
         <h1 className="text-7xl my-2 tracking-tight">Card <span className='text-blue-700'>Queries</span></h1>
       </div>
-      <div className="tailwind-preflight relative flex flex-col">
-        <form className='flex flex-col items-center' onSubmit={(e) => servers(e)} name='card'>
-          <p className='mb-2'>Enter your query manually, or fill out the form.</p>
-          <Input name="manual" />
-          <div className='grid grid-cols-2 m-2 w-72 sm:w-96 gap-4 items-center'>
-            <p>Filter Season</p>
-            <Dropdown name='season' items={["All", "Season 1", "Season 2", "Season 3"]} defindex={3} />
-          </div>
-          <div className='grid grid-cols-2 m-2 w-72 sm:w-96 gap-4 items-center'>
-            <p>Pick Trophies</p>
+      <div className="relative flex flex-col">
+        <form className='flex flex-col items-center' onSubmit={(e) => makeRequest(e)} name='card'>
+          <p className='mb-6'>Enter your query manually, or fill out the form.</p>
+          <Input className='mb-6 w-full' name="manual" />
+          <FormItem label='Filter Season'>
+            <Dropdown name='season' items={["All", "Season 1", "Season 2", "Season 3"]} defindex={0} />
+          </FormItem>
+          <FormItem label='Pick Trophies'>
             <MultipleInput categories={trophies} suggestions='trophies' />
-          </div>
-          <div className='grid grid-cols-2 m-2 w-72 sm:w-96 gap-4 items-center'>
-            <p>Pick Badges</p>
+          </FormItem>
+          <FormItem label='Pick Badges'>
             <MultipleInput categories={badges} suggestions='badges' />
-          </div>
-          <div className='grid grid-cols-2 m-2 w-72 sm:w-96 gap-4 items-center'>
-            <p>WA Category</p>
+          </FormItem>
+          <FormItem label='WA Category'>
             <ComboBox items={governments} name="category" />
-          </div>
-          <div className='grid grid-cols-2 m-2 w-72 sm:w-96 gap-4 items-center'>
-            <p>Filter Rarity</p>
+          </FormItem>
+          <FormItem label='Rarity'>
             <Dropdown name='cardcategory' items={["All", "Common", "Uncommon", "Rare", "Ultra-Rare", "Epic", "Legendary"]} defindex={0} />
-          </div>
-          <div className='grid grid-cols-2 m-2 w-72 sm:w-96 gap-4 items-center'>
-            <p>Region</p>
+          </FormItem>
+          <FormItem label='Region'>
             <Input name='region' />
-          </div>
-          <div className='grid grid-cols-2 m-2 w-72 sm:w-96 gap-4 items-center'>
-            <p>Ex-Nation? (s1 only)</p>
+          </FormItem>
+          <FormItem label='Ex-Nation? (s1 only)'>
             <div className='flex gap-2'>
               <input type="checkbox" id="exnation" name="exnation" />
               <label htmlFor="exnation">Ex-Nation</label>
             </div>
-          </div>
-          <div className='grid grid-cols-2 m-2 w-72 sm:w-96 gap-4 items-center'>
-            <p>Flag</p>
+          </FormItem>
+          <FormItem label='Flag'>
             <ComboBox items={flags} name='flag' />
-          </div>
-          <div className='grid grid-cols-2 m-2 w-72 sm:w-96 gap-4 items-center'>
-            <p>Motto</p>
+          </FormItem>
+          <FormItem label='Motto'>
             <Input name='motto' />
-          </div>
-          <div className='grid grid-cols-2 m-2 w-72 sm:w-96 gap-4 items-center'>
-            <p>Name</p>
+          </FormItem>
+          <FormItem label='Name'>
             <Input name='name' />
-          </div>
-          <div className='grid grid-cols-2 m-2 w-72 sm:w-96 gap-4 items-center'>
-            <p>Pretitle</p>
-            <Input name='pretitle' />
-          </div>
+          </FormItem>
+          <FormItem label='Type'>
+            <Input name='type' />
+          </FormItem>
           <div className='grid grid-cols-2 m-2 w-72 sm:w-96 gap-4 items-center justify-center'>
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input type="checkbox" value="" className="sr-only peer" checked={collectionType} onChange={() => setCollectionType(!collectionType)} />
-              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-              <span className="ml-3 text-sm font-medium">
-                {collectionType ? 'Collection' : 'Deck'}
-              </span>
-            </label>
+            <div className='flex items-center gap-4'>
+            <Switch id="collection" onCheckedChange={() => setCollectionType(collectionType === 'Collection' ? 'Deck' : 'Collection')}  />
+            <Label htmlFor="collection">{collectionType}</Label>
+            </div>
             <Input name='collection' />
+          </div>
+          <div className="flex flex-col gap-2 items-center mt-6">
+              <Switch name="mode" id="mode" onCheckedChange={() => render === "Cards" ? setRender('Names') : setRender('Cards')} />
+              <Label htmlFor="mode">{render}</Label>
           </div>
           <Button variant={"outline"}
           data-umami-event="Search Query" className="mt-6 transition duration-500 bg-blue-700 hover:bg-blue-600" type='submit'>Search</Button>
         </form>
       </div>
-      <div className='tailwind-preflight flex flex-col mt-16 gap-4'>
+      <div className='flex flex-col mt-16 gap-4'>
         <p className='text-lg font-bold mb-2 text-center'>Previous Queries</p>
         {queries.map((query, i) => {
           return (
             <div key={query + i} className='grid-cols-[25px_auto_1fr] grid gap-4'>
-              <img src="trash-small.png" onClick={() => {
-                setQueries(queries.filter(queryitem => queryitem !== query))
-                localStorage.setItem('queries', JSON.stringify(queries.filter(queryitem => queryitem !== query)))
-              }}/>
-              <a className='hover:text-blue-700' data-umami-event="Viewed Previous Query" 
+              <Trash className='hover:cursor-pointer' onClick={() => {
+                setQueries(prevQueries => prevQueries.filter((_, index) => index !== i));
+                localStorage.setItem('queries', JSON.stringify(queries.filter((_, index) => index !== i)));
+              }} />
+              <Clipboard className='hover:cursor-pointer' onClick={() => navigator.clipboard.writeText(query)}/>
+              <a className='hover:text-blue-700 hover:cursor-pointer' data-umami-event="Viewed Previous Query" 
               onClick={() => window.location.href = `/query?${query}`}>{query.length > 45 ? query.slice(0, 45) + '...' : query}
               </a>
             </div>

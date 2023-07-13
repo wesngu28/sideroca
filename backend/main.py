@@ -126,6 +126,6 @@ def index(
     )
 
     if (mode):
-        return {"cards": [card.name for card in query_finales.with_entities(models.Card.name).all()]}
+        return {"cards": [{"id": card.id, "name": card.name} for card in query_finales.with_entities(models.Card.name, models.Card.id).all()]}
     else: 
         return {"cards": query_finales.all()}

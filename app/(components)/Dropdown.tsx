@@ -12,7 +12,7 @@ export function Dropdown({ items, name, defindex }: Props) {
     return (
         <Select name={name}>
             <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder={defindex} />
+                <SelectValue placeholder={items[defindex]} />
             </SelectTrigger>
             <SelectContent>
                 {items.map(item => {

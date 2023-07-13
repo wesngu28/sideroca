@@ -1,4 +1,4 @@
-import { badges } from "../(helpers)/specialBadges"
+import { badgesDict } from "../(helpers)/categories"
 
 interface Props { cardBadges: { [key: string]: string; }, cardTrophies: string[] }
 
@@ -23,14 +23,14 @@ export function Badges({ cardBadges, cardTrophies }: Props) {
                     if (badge === 'Easter Egg') {
                         let repl = Object.values(cardBadges)[i]
                         if (Number(Object.values(cardBadges)[i]) >= 4) repl = String(4)
-                        let badge_img = badges[badge].replace('1', repl)
+                        let badge_img = badgesDict[badge].replace('1', repl)
                         return (
                             <img alt={badge} key={badge} src={`https://www.nationstates.net/images/trophies/${badge_img}.png`}
                                 className="trophy inline" title={`${badge}`} />
                         )
                     }
-                    if (badges[badge]) {
-                        let badge_img = badges[badge]
+                    if (badgesDict[badge]) {
+                        let badge_img = badgesDict[badge]
                         return (
                             <img alt={badge} key={badge} src={`https://www.nationstates.net/images/trophies/${badge_img}.png`}
                                 className="trophy inline" title={`${badge}`} />
