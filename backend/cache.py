@@ -1,4 +1,5 @@
 import redis
+import os
 
 def create_redis():
   return redis.ConnectionPool(
