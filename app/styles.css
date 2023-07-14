@@ -430,6 +430,7 @@ td .deckcard-token {
 }
 
 .deckcard-container {
+    overflow: hidden;
     width: 280px;
     height: 400px;
     margin: 12px;
