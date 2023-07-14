@@ -1,5 +1,6 @@
 export const trophies = [
     '',
+    'Sans',
     'Civil Rights',
     'Economy',
     'Political Freedoms',
@@ -118,6 +119,7 @@ export const governments = [
 ]
 
 export const flags = [
+  'Aaland Islands',
   "Afghanistan",
   "Albania",
   "Alderney",
@@ -411,6 +413,7 @@ export const banners: { [key: string]: string } = {
 }
 export const badges = [
     '',
+    'Sans',
     'Admin',
     'Class',
     'Commended',

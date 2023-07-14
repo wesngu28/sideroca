@@ -72,6 +72,10 @@ export function ComboBox({ items, name, idx }: Props) {
             {name === "trophies" && value && !value.includes('!') && <>
                 <RadioGroup className="flex" defaultValue="" name={`${value}%`}>
                     <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="1t" id="1st" />
+                        <Label htmlFor="1st">1t</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
                         <RadioGroupItem value="1" id="1percent" />
                         <Label htmlFor="1percent">1%</Label>
                     </div>

@@ -59,60 +59,77 @@ export function Query() {
     useEffect(() => {
         async function fetcher() {
             try {
-                let baseString = window.location.href.replace(`${process.env.NEXT_PUBLIC_SITE}/query`, 'https://nsfastapitest-production.up.railway.app/')
-                const collection = searchParams.get('collection')
-                const deck = searchParams.get('deck')
-                let reqText = ""
-                if (collection) reqText = `collection;collectionid=${collection}`
-                if (deck) reqText = `deck;nationname=${deck}`
-                let collectionCards: any = {}
-                if (collection || deck) {
-                    const cardsReq = await fetch(`https://www.nationstates.net/cgi-bin/api.cgi?q=cards+${reqText}`, {
+                let baseString = window.location.href.replace(`${process.env.NEXT_PUBLIC_SITE}/query`, 'https://nscards.up.railway.app/cards')
+                let collectionCards: any[] = []
+                let deckCards: any[] = []
+                let collectionParam: string | string[] | null = searchParams.get('collection')
+                let deckParam = searchParams.get('deck')
+                if (collectionParam) {
+                    collectionParam = collectionParam.split(',')
+                    for (let collection of collectionParam) {
+                        const cardsReq = await fetch(`https://www.nationstates.net/cgi-bin/api.cgi?q=cards+${`collection;collectionid=${collection}`}`, {
+                            headers: {
+                                'User-Agent': "Kractero card queries"
+                            }
+                        })
+                        const cardsText = await cardsReq.text()
+                        const parser = new XMLParser()
+                        let cards = parser.parse(cardsText)
+                        if (!(cards.CARDS.COLLECTION && cards.CARDS.COLLECTION.DECK.CARD)
+                            && !(cards.CARDS.DECK && cards.CARDS.DECK.CARD)) {
+                            throw new Error("Something is wrong with the collection or deck you gave")
+                        }
+                        cards.CARDS.COLLECTION.DECK.CARD.forEach((card: { CARDID: any }) => {
+                            for (let obj of collectionCards) {
+                                if (obj.CARDID === card.CARDID) return
+                            }
+                            collectionCards.push(card)
+                        })
+                    }
+                }
+                if (deckParam) {
+                    const cardsReq = await fetch(`https://www.nationstates.net/cgi-bin/api.cgi?q=cards+${`deck;nationname=${deckParam}`}`, {
                         headers: {
                             'User-Agent': "Kractero card queries"
                         }
                     })
                     const cardsText = await cardsReq.text()
                     const parser = new XMLParser()
-                    collectionCards = parser.parse(cardsText)
-                    if (!(collectionCards.CARDS.COLLECTION && collectionCards.CARDS.COLLECTION.DECK.CARD)
-                        && !(collectionCards.CARDS.DECK && collectionCards.CARDS.DECK.CARD)) {
+                    let cards = parser.parse(cardsText)
+                    if (!(cards.CARDS.DECK && cards.CARDS.DECK.CARD)) {
                         throw new Error("Something is wrong with the collection or deck you gave")
                     }
+                    deckCards = cards.CARDS.DECK.CARD
                 }
-                if (!collectionCards.error) {
-                    const getCards = await fetch('/api', {
-                        body: baseString,
-                        method: "POST"
-                    })
-                    const cardsJson = await getCards.json()
-                    let cardList: Card[] = await Promise.all((cardsJson.cards as Card[]).map(async (nation) => {
-                        let inCollection = undefined;
-                      
-                        if (Object.keys(collectionCards).length > 0) {
-                          if (collectionCards.CARDS.COLLECTION && collectionCards.CARDS.COLLECTION.DECK.CARD) {
-                            inCollection = collectionCards.CARDS.COLLECTION.DECK.CARD.some(
-                              (collectionCard: { CARDID: any }) => collectionCard.CARDID === Number(nation.id)
-                            );
-                          } else if (collectionCards.CARDS.DECK && collectionCards.CARDS.DECK.CARD) {
-                            inCollection = collectionCards.CARDS.DECK.CARD.some(
-                              (collectionCard: { CARDID: any }) => collectionCard.CARDID === Number(nation.id)
-                            );
-                          }
-                        }
-                        return { ...nation, inCollection };
-                    }));
-                    cardList = cardList.sort((a, b) => {
-                        if (a.inCollection && !b.inCollection) return 1;
-                        if (!a.inCollection && b.inCollection) return -1;
-                        if (a.inCollection && b.inCollection) {
-                            if (a.id === b.id) return 0;
-                            return a.id > b.id ? 1 : -1;
-                        }
+                const getCards = await fetch('/api', {
+                    body: baseString,
+                    method: "POST"
+                })
+                let cardsJson = await getCards.json()
+                let cardList: Card[] = await Promise.all((cardsJson.cards as Card[]).map(async (nation) => {
+                    let inCollection = undefined;
+                    if (collectionCards.length > 0) {
+                        inCollection = collectionCards.some(
+                            (collectionCard: { CARDID: any }) => collectionCard.CARDID === Number(nation.id)
+                        );
+                    }
+                    if (deckCards.length > 0) {
+                        inCollection = deckCards.some(
+                            (collectionCard: { CARDID: any }) => collectionCard.CARDID === Number(nation.id)
+                        );
+                    }
+                    return { ...nation, inCollection };
+                }));
+                cardList = cardList.sort((a, b) => {
+                    if (a.inCollection && !b.inCollection) return 1;
+                    if (!a.inCollection && b.inCollection) return -1;
+                    if (a.inCollection && b.inCollection) {
+                        if (a.id === b.id) return 0;
                         return a.id > b.id ? 1 : -1;
-                    })
-                    setCorrespondingJson(cardList as Card[])
-                }
+                    }
+                    return a.id > b.id ? 1 : -1;
+                })
+                setCorrespondingJson(cardList as Card[])
             } catch (error: any) {
                 setErrorMessage("Error: " + error.message);
             }
@@ -121,9 +138,9 @@ export function Query() {
     }, [searchParams])
     return (
         <main className="flex min-h-screen flex-col items-center p-12">
-            <a href="/">
-                <Button variant={"outline"} 
-                data-umami-event="Make New Query" className="text-white transition duration-500 bg-blue-700 hover:bg-blue-600 mb-8">
+           <a href="/">
+                <Button variant={"outline"}
+                    data-umami-event="Make New Query" className="text-white transition duration-500 bg-blue-700 hover:bg-blue-600 mb-8">
                     New Query
                 </Button>
             </a>
@@ -154,19 +171,19 @@ export function Query() {
                                     {currentItems.map((card, i) => <p key={i}>{card.name}</p>)}
                                 </div>
                                 :
-                                currentItems.map(card =>
-                                        card.season !== 3 ? (
-                                            <S1S2Card key={card.id} card={card} />
-                                        ) : (
-                                            <S3Card key={card.id} card={card} />
-                                        )
+                                currentItems.map((card, i) =>
+                                    card.season !== 3 ? (
+                                        <S1S2Card key={`${card.name}-${card.season}`} card={card} />
+                                    ) : (
+                                        <S3Card key={`${card.name}-${card.season}`} card={card} />
                                     )
+                                )
                             }
                         </div>
                     </div>
                 </>
                 : <p className='dark:text-white text-lg font-bold mb-2'>Generating cards for {lastQuery}, please wait...</p>}
-            {errorMessage && <p className="text-red-500">{errorMessage}</p>}
-        </main>
+                {errorMessage && <p className="text-red-500">{errorMessage}</p>}
+            </main>
     )
 }
