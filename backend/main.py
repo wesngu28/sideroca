@@ -14,6 +14,7 @@ from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 import hashlib
 import re
+from redisgen import create_redis_databases
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -36,6 +37,7 @@ def get_limiter_key(request: Request):
 
 limiter = Limiter(key_func=get_limiter_key, storage_uri="redis://localhost:6379/1")
 app = FastAPI()
+create_redis_databases()
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
