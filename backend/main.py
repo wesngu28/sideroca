@@ -117,8 +117,12 @@ async def index(
             if param in ('name', 'type', 'region', 'flag', 'motto'):
                 value = request.query_params[param]
                 values = value.split(",") if value else []
-                formatted_values = [~getattr(models.Card, param).ilike(f"%{value[1:].replace(' ', '_')}%") if value is not None and value.startswith('!') else getattr(models.Card, param).ilike(f"%{value.replace(' ', '_')}%") if value is not None else True for value in values]
-                match_queries.append(or_(*formatted_values) if formatted_values is not None else True)
+                if value.startswith('=') or '!=' in value:
+                    formatted_values = [~getattr(models.Card, param) == value[1:] if value is not None and value.startswith('!') else getattr(models.Card, param) == value if value is not None else True for value in values]
+                    match_queries.append(or_(*formatted_values))
+                else:
+                    formatted_values = [~getattr(models.Card, param).ilike(f"%{value[1:].replace(' ', '_')}%") if value is not None and value.startswith('!') else getattr(models.Card, param).ilike(f"%{value.replace(' ', '_')}%") if value is not None else True for value in values]
+                    match_queries.append(or_(*formatted_values) if formatted_values is not None else True)
 
             if param in ('category', 'cardcategory'):
                 value = request.query_params[param]
