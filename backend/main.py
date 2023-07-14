@@ -65,7 +65,7 @@ class CardSchema(BaseModel):
     trophies: Union[list, dict]
 
 @app.get("/cards")
-@limiter.limit("30/minute")
+@limiter.limit("500/minute")
 async def index(
     request: Request,
     db: Session = Depends(get_db),
@@ -85,7 +85,8 @@ async def index(
     if all(value is None for value in request.query_params.keys()):
         return {"cards": []}
     cached_response = cache.get(str(request.query_params))
-    if cached_response:
+    if cached_response == 'washman':
+        print ('cached')
         return json.loads(cached_response)
     else:
         sans_queries = []
@@ -109,28 +110,32 @@ async def index(
                         and_badges.append(elements[0])
                         if len(elements) > 1:
                             or_badges.append(elements[1])
-                    format_or_badges = [' '.join(word.capitalize() if param == 'badges' else word.upper() for word in badge.split('_')) for badge in or_badges]
-                    format_and_badges = [' '.join(word.capitalize() if param == 'badges' else word.upper() for word in badge.split('_')) for badge in and_badges]
-                    or_badges_queries = [getattr(models.Card, param).comparator.contains([badge[1:]]) if badge.startswith('!') else getattr(models.Card, param)[badge] for badge in format_or_badges]
-                    and_badges_queries = [getattr(models.Card, param).comparator.contains([badge[1:]]) if badge.startswith('!') else getattr(models.Card, param)[badge] for badge in format_and_badges]
+                    format_or_badges = [' '.join(word.capitalize() if word[0].isalpha() else word[0] + word[1].capitalize() + word[2:] if param == 'badges' else word.upper() for word in badge.split('_')) for badge in or_badges]
+                    format_and_badges = [' '.join(word.capitalize() if word[0].isalpha() else word[0] + word[1].capitalize() if param == 'badges' else word.upper() for word in badge.split('_')) for badge in and_badges]
+                    or_badges_queries = [~(getattr(models.Card, param)[badge[1:]]) if badge.startswith('!') else getattr(models.Card, param)[badge] for badge in format_or_badges]
+                    and_badges_queries = [~(getattr(models.Card, param)[badge[1:]]) if badge.startswith('!') else getattr(models.Card, param)[badge] for badge in format_and_badges]
 
             if param in ('name', 'type', 'region', 'flag', 'motto'):
                 value = request.query_params[param]
                 values = value.split(",") if value else []
-                formatted_values = [~getattr(models.Card, param).ilike(f"%{value[1:].replace(' ', '_')}%") if value is not None and value.startswith('!') else getattr(models.Card, param).ilike(f"%{value.replace(' ', '_')}%") if value is not None else True for value in values]
-                match_queries.append(or_(*formatted_values) if formatted_values is not None else True)
+                if value.startswith('=') or '!=' in value:
+                    formatted_values = [~getattr(models.Card, param) == value[2:] if value is not None and value.startswith('!') else getattr(models.Card, param) == value[1:] if value is not None else True for value in values]
+                    match_queries.append(*formatted_values)
+                else:
+                    formatted_values = [~getattr(models.Card, param).ilike(f"%{value[1:].replace(' ', '_')}%") if value is not None and value.startswith('!') else getattr(models.Card, param).ilike(f"%{value.replace(' ', '_')}%") if value is not None else True for value in values]
+                    match_queries.append(or_(*formatted_values) if formatted_values is not None else True)
 
             if param in ('category', 'cardcategory'):
                 value = request.query_params[param]
                 values = value.split(",") if value else []
                 if param == 'category':
-                    values = [' '.join(word.capitalize() for word in value.split('_')) for value in values]
-                formatted_values = [~getattr(models.Card, param) == value[1:] if value is not None and value.startswith('!') else getattr(models.Card, param) == value if value is not None else True for value in values]
+                    values = [' '.join(word.capitalize() if word[0].isalpha() else word[0] + word[1].capitalize() + word[2:] for word in value.split('_')) for value in values]
+                formatted_values = [~(getattr(models.Card, param) == value[1:]) if value is not None and value.startswith('!') else getattr(models.Card, param) == value if value is not None else True for value in values]
                 match_queries.append(or_(*formatted_values))
 
         query_finales = db.query(models.Card).filter(
                 season is None or models.Card.season == str(season),
-                or_(*match_queries) if match_queries is not None else True,
+                *match_queries if match_queries is not None else True,
                 *sans_queries if sans_queries is not None else True,
                 or_(*or_badges_queries) if or_badges_queries is not None else True,
                 *and_badges_queries if and_badges_queries is not None else True,
