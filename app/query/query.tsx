@@ -8,6 +8,9 @@ import { useSearchParams } from "next/navigation"
 import { XMLParser } from 'fast-xml-parser'
 import ReactPaginate from 'react-paginate';
 import { Button } from '@/components/ui/button'
+import { Download, Home } from 'lucide-react'
+import { Pagination } from '@mantine/core';
+import { MantineProvider } from '@mantine/core'
 
 function downloadCSV(data: Card[], filename: string) {
     const csvData = convertJSONToCSV(data);
@@ -37,18 +40,24 @@ function convertJSONToCSV(jsonData: Card[]) {
 }
 
 export function Query() {
+    const [queryTracker, setQueryTracker] = useState(0);
     const [correspondingJson, setCorrespondingJson] = useState<Array<Card>>([])
     const [errorMessage, setErrorMessage] = useState<string>("");
     const searchParams = useSearchParams()
     const lastQuery = searchParams.toString()
     const [itemOffset, setItemOffset] = useState(0);
-    const endOffset = itemOffset + 50;
+    const [activePage, setActivePage] = useState(1);
+    const itemsPerPage = 50;
+    const endOffset = itemOffset + itemsPerPage;
     const currentItems = correspondingJson.slice(itemOffset, endOffset);
-    const pageCount = Math.ceil(correspondingJson.length / 50);
-    const handlePageClick = (event: { selected: number }) => {
-        const newOffset = (event.selected * 50) % correspondingJson.length;
-        setItemOffset(newOffset);
+    const pageCount = Math.ceil(correspondingJson.length / itemsPerPage);
+    
+    const handlePageChange = (selectedPage: number) => {
+      const newOffset = (selectedPage - 1) * itemsPerPage;
+      setItemOffset(newOffset);
+      setActivePage(selectedPage);
     };
+    
     const handleDownload = () => {
         if (correspondingJson.length > 0) {
             const filename = `${lastQuery}.csv`;
@@ -59,7 +68,8 @@ export function Query() {
     useEffect(() => {
         async function fetcher() {
             try {
-                let baseString = window.location.href.replace(`${process.env.NEXT_PUBLIC_SITE}/query`, 'https://nscards.up.railway.app/cards')
+                let baseString = window.location.href.replace(`${process.env.NEXT_PUBLIC_SITE}/query`, 'http://127.0.0.1:8000/cards')
+                let cardList: Card[] = []
                 let collectionCards: any[] = []
                 let deckCards: any[] = []
                 let collectionParam: string | string[] | null = searchParams.get('collection')
@@ -72,6 +82,18 @@ export function Query() {
                                 'User-Agent': "Kractero card queries"
                             }
                         })
+                        setQueryTracker((prevQueryTracker) => {
+                            const now = new Date()
+                            if (now.getTime() > JSON.parse(localStorage.getItem('nsqueries')!).expiration) {
+                                const expirationDate = new Date().getTime() + 30000;
+                                localStorage.setItem('nsqueries', JSON.stringify({ value: 0, expiration: expirationDate }));
+                                return 0
+                            }
+                            const updatedQueryTracker = prevQueryTracker + 1;
+                            const expirationDate = new Date().getTime() + 30000;
+                            localStorage.setItem('nsqueries', JSON.stringify({ value: updatedQueryTracker, expiration: expirationDate }));
+                            return updatedQueryTracker;
+                        });
                         const cardsText = await cardsReq.text()
                         const parser = new XMLParser()
                         let cards = parser.parse(cardsText)
@@ -93,6 +115,18 @@ export function Query() {
                             'User-Agent': "Kractero card queries"
                         }
                     })
+                    setQueryTracker((prevQueryTracker) => {
+                        const now = new Date()
+                        if (now.getTime() > JSON.parse(localStorage.getItem('nsqueries')!).expiration) {
+                            const expirationDate = new Date().getTime() + 30000;
+                            localStorage.setItem('nsqueries', JSON.stringify({ value: 0, expiration: expirationDate }));
+                            return 0
+                        }
+                        const updatedQueryTracker = prevQueryTracker + 1;
+                        const expirationDate = new Date().getTime() + 30000;
+                        localStorage.setItem('nsqueries', JSON.stringify({ value: updatedQueryTracker, expiration: expirationDate }));
+                        return updatedQueryTracker;
+                    });
                     const cardsText = await cardsReq.text()
                     const parser = new XMLParser()
                     let cards = parser.parse(cardsText)
@@ -101,12 +135,24 @@ export function Query() {
                     }
                     deckCards = cards.CARDS.DECK.CARD
                 }
+                if (collectionCards.length > 0 && deckCards.length > 0) {
+                    console.log(deckCards)
+                    console.log(collectionCards)
+                    const cardsNotInCollection = deckCards.filter((card) => {
+                        return !collectionCards.some((collectionCard) => collectionCard.CARDID === card.CARDID);
+                    });
+                    const getCards = await fetch('/api/collection', {
+                        body: JSON.stringify({ "url": baseString, "cards": cardsNotInCollection }),
+                        method: "POST"
+                    })
+                    cardList = await getCards.json()
+                }
                 const getCards = await fetch('/api', {
                     body: baseString,
                     method: "POST"
                 })
                 let cardsJson = await getCards.json()
-                let cardList: Card[] = await Promise.all((cardsJson.cards as Card[]).map(async (nation) => {
+                cardList = await Promise.all((cardsJson.cards as Card[]).map(async (nation) => {
                     let inCollection = undefined;
                     if (collectionCards.length > 0) {
                         inCollection = collectionCards.some(
@@ -137,24 +183,29 @@ export function Query() {
         fetcher()
     }, [searchParams])
     return (
-        <main className="flex min-h-screen flex-col items-center p-12">
-           <a href="/">
-                <Button variant={"outline"}
-                    data-umami-event="Make New Query" className="text-white transition duration-500 bg-blue-700 hover:bg-blue-600 mb-8">
-                    New Query
-                </Button>
-            </a>
+        <MantineProvider>
+            <div className='flex gap-4'>
+                <a href="/">
+                    <Button variant={"outline"}
+                        data-umami-event="Make New Query" className="text-white transition duration-500 bg-blue-700 hover:bg-blue-600 mb-8">
+                        <Home />
+                    </Button>
+                </a>
+                {correspondingJson.length > 0 && <Button variant={'outline'}
+                    onClick={handleDownload}
+                    className="text-white transition duration-500 bg-blue-700 hover:bg-blue-600 mb-8"
+                >
+                    <Download />
+                </Button>}
+            </div>
+            <h4 className="leading-7">Your current queries to NS API: {queryTracker}/30</h4>
+            <small className='text-xs leading-none mb-4'>(50/30 seconds allowed)</small>
             {correspondingJson.length > 0 ?
                 <>
-                    <Button variant={'outline'}
-                        onClick={handleDownload}
-                        className="text-white transition duration-500 bg-blue-700 hover:bg-blue-600 mb-8"
-                    >
-                        Download Card List (CSV)
-                    </Button>
-                    <p className='dark:text-white text-lg font-bold mb-2'>{lastQuery}</p>
+                    <p className='dark:text-white text-lg font-bold mb-2'>?{lastQuery}</p>
                     <div className='flex flex-col flex-wrap items-center gap-4 dark:text-white'>
-                        <ReactPaginate
+                        <Pagination value={activePage} onChange={handlePageChange} total={pageCount} />
+                        {/* <ReactPaginate
                             className='flex py-1 mt-4 mb-8 text-white
                                 [&>li>a]:p-3 [&>li>a]:border-gray-800 [&>li>a]:bg-blue-700 [&>li>a]:border-solid [&>li>a]:border [&>li>a]:cursor-pointer'
                             breakLabel="..."
@@ -164,8 +215,8 @@ export function Query() {
                             pageCount={pageCount}
                             previousLabel="Previous"
                             renderOnZeroPageCount={null}
-                        />
-                        <div>
+                        /> */}
+                        <div className='flex flex-wrap justify-center'>
                             {!correspondingJson[0].motto ?
                                 <div className='flex flex-col dark:text-white'>
                                     {currentItems.map((card, i) => <p key={i}>{card.name}</p>)}
@@ -173,9 +224,9 @@ export function Query() {
                                 :
                                 currentItems.map((card, i) =>
                                     card.season !== 3 ? (
-                                        <S1S2Card key={`${card.name}-${card.season}`} card={card} />
+                                        <S1S2Card key={`${card.name}-${card.season}-${i}`} card={card} />
                                     ) : (
-                                        <S3Card key={`${card.name}-${card.season}`} card={card} />
+                                        <S3Card key={`${card.name}-${card.season}-${i}`} card={card} />
                                     )
                                 )
                             }
@@ -183,7 +234,7 @@ export function Query() {
                     </div>
                 </>
                 : <p className='dark:text-white text-lg font-bold mb-2'>Generating cards for {lastQuery}, please wait...</p>}
-                {errorMessage && <p className="text-red-500">{errorMessage}</p>}
-            </main>
+            {errorMessage && <p className="text-red-500">{errorMessage}</p>}
+        </MantineProvider>
     )
 }

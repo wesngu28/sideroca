@@ -152,20 +152,20 @@ async def index(
             cache.expire(str(request.query_params), 86400)
             return card_dicts
         
-# @app.post("/")
-# @limiter.limit("15/minute")
-# async def index(request: Request, db: Session = Depends(get_db), cache: Union[Redis, None] = Depends(get_redis)):
-#     cards_in_collection = await request.json()
-#     cached_response = cache.get(str(request.query_params))
-#     if cached_response:
-#         return json.loads(cached_response)
-#     else:
-#         query_finales = []
-#         for card in cards_in_collection:
-#             query = db.query(models.Card).filter(
-#                 models.Card.id == card['CARDID'],
-#                 models.Card.season == card['SEASON'],
-#                 models.Card.cardcategory == card['CATEGORY']
-#             )
-#             query_finales.extend(query.all())
-#         return query_finales
+@app.post("/collection")
+@limiter.limit("30/minute")
+async def index(request: Request, db: Session = Depends(get_db), cache: Union[Redis, None] = Depends(get_redis)):
+    cards_in_collection = await request.json()
+    cached_response = cache.get(str(request.query_params))
+    if cached_response:
+        return json.loads(cached_response)
+    else:
+        query_finales = []
+        for card in cards_in_collection:
+            query = db.query(models.Card).filter(
+                models.Card.id == card['CARDID'],
+                models.Card.season == card['SEASON'],
+                models.Card.cardcategory == card['CATEGORY']
+            )
+            query_finales.extend(query.all())
+        return query_finales
