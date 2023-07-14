@@ -13,6 +13,7 @@ import FormItem from './(components)/FormItem'
 import { Clipboard, Trash } from 'lucide-react'
 import { MultipleInput } from './(components)/Input'
 import { Label } from '@/components/ui/label'
+import Link from 'next/link'
 
 export default function Home() {
 
@@ -50,7 +51,7 @@ export default function Home() {
             let trophies = ["trophies="]
             for (const key of trophyKeys) {
               if (key.includes('trophies')) trophies.push(trophiesDict[formData.get(key)! as string].replaceAll(' ', '_'))
-              if (key.includes('%')) trophies.push(`-${(formData.get(key) as string)}`)
+              if (key.includes('%') || key === '1t') trophies.push(`-${(formData.get(key) as string)}`)
             }
             query.push(trophies.join(',').replace(',', '').replaceAll(',-', '-'))
           }
@@ -88,6 +89,7 @@ export default function Home() {
     <main className="flex min-h-screen flex-col items-center p-12">
       <div className='mt-2 mb-10 text-center'>
         <h1 className="text-7xl my-2 tracking-tight">Card <span className='text-blue-700'>Queries</span></h1>
+        <Link href="/docs"><Button className='rounded-md text-sm font-medium px-4 py-2 my-2'>API Docs</Button></Link>
       </div>
       <div className="relative flex flex-col">
         <form className='flex flex-col items-center' onSubmit={(e) => makeRequest(e)} name='card'>
@@ -162,6 +164,7 @@ export default function Home() {
         })}
       </div>
       <img className='my-8' src='https://ucarecdn.com/8c89fbf7-f54f-4297-b569-f3fae95568d4/' />
+      <Link href="/dev"><Button className='rounded-md text-sm font-medium px-4 py-2 my-2'>Stack</Button></Link>
     </main>
   )
 }
