@@ -21,7 +21,7 @@ export default function Dev() {
                         </a>
                     </div>
                     <div className="m-6 h-full text-sm md:text-base">
-                        Used by some of the world's largest companies, Next.js enables you to create full-stack Web applications by extending 
+                        Used by some of the world&apos;s largest companies, Next.js enables you to create full-stack Web applications by extending 
                         the latest React features, and integrating powerful Rust-based JavaScript tooling for the fastest builds.
                     </div>
                 </div>

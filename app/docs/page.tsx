@@ -135,13 +135,13 @@ export default function Docs() {
                         <p className="ml-6 mb-2">Possible Badges:</p>
                         <ul className="ml-6 list-disc [&>li]:mt-2 [&>li]:ml-4 [&>li]:text-sm">
                             <li>Sans</li>
-                            {badges.map(badge => <li>{badge}</li>)}
+                            {badges.map(badge => <li key={badge}>{badge}</li>)}
                         </ul>
                         <li>Category - These are WA government categories</li>
                         <p className="ml-6 my-2">Format: category=anarchy</p>
                         <p className="ml-6 mb-2">Possible Categories:</p>
                         <ul className="ml-6 list-disc [&>li]:mt-2 [&>li]:ml-4 [&>li]:text-sm">
-                            {governments.map(government => <li>{government}</li>)}
+                            {governments.map(government => <li key={government}>{government}</li>)}
                         </ul>
                         <li>Cardcategory (Rarity) - You know these</li>
                         <p className="ml-6 my-2">Format: cardcategory=legendary</p>
@@ -153,7 +153,7 @@ export default function Docs() {
                         <p className="ml-6 my-2">Format: flag=afghanistan</p>
                         <p className="ml-6 mb-2">Possible Flags:</p>
                         <ul className="ml-6 list-disc [&>li]:mt-2 [&>li]:ml-4 [&>li]:text-sm">
-                            {flags.map(flag => <li>{flag}</li>)}
+                            {flags.map(flag => <li key={flag}>{flag}</li>)}
                         </ul>
                         <li>Motto - searches motto, currently only supports partial</li>
                         <p className="ml-6 my-2">Format: motto=lion</p>
