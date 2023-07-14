@@ -14,7 +14,6 @@ from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 import hashlib
 import re
-from redisgen import create_redis_databases
 import os
 
 models.Base.metadata.create_all(bind=engine)
