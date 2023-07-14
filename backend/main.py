@@ -63,8 +63,8 @@ class CardSchema(BaseModel):
     badges: Union[list, dict]
     trophies: Union[list, dict]
 
-@app.get("/")
-@limiter.limit("15/minute")
+@app.get("/cards")
+@limiter.limit("30/minute")
 async def index(
     request: Request,
     db: Session = Depends(get_db),
@@ -87,7 +87,6 @@ async def index(
     if cached_response:
         return json.loads(cached_response)
     else:
-        ilike_queries = []
         sans_queries = []
         or_badges_queries = []
         and_badges_queries = []
@@ -104,11 +103,11 @@ async def index(
                     for value in values:
                         elements = value.split("|")
                         if len(values) == 1:
-                            and_badges.extend(elements)
+                            or_badges.extend(elements)
                             break
-                        or_badges.append(elements[0])
+                        and_badges.append(elements[0])
                         if len(elements) > 1:
-                            and_badges.append(elements[1])
+                            or_badges.append(elements[1])
                     format_or_badges = [' '.join(word.capitalize() if param == 'badges' else word.upper() for word in badge.split('_')) for badge in or_badges]
                     format_and_badges = [' '.join(word.capitalize() if param == 'badges' else word.upper() for word in badge.split('_')) for badge in and_badges]
                     or_badges_queries = [getattr(models.Card, param).comparator.contains([badge[1:]]) if badge.startswith('!') else getattr(models.Card, param)[badge] for badge in format_or_badges]
@@ -126,15 +125,11 @@ async def index(
                 if param == 'category':
                     values = [' '.join(word.capitalize() for word in value.split('_')) for value in values]
                 formatted_values = [~getattr(models.Card, param) == value[1:] if value is not None and value.startswith('!') else getattr(models.Card, param) == value if value is not None else True for value in values]
-                if param == 'category':
-                    match_queries.append(and_(*formatted_values))
-                else:
-                    match_queries.append(or_(*formatted_values))
+                match_queries.append(or_(*formatted_values))
 
         query_finales = db.query(models.Card).filter(
                 season is None or models.Card.season == str(season),
-                *ilike_queries if ilike_queries is not None else True,
-                *match_queries if ilike_queries is not None else True,
+                or_(*match_queries) if match_queries is not None else True,
                 *sans_queries if sans_queries is not None else True,
                 or_(*or_badges_queries) if or_badges_queries is not None else True,
                 *and_badges_queries if and_badges_queries is not None else True,
@@ -151,20 +146,20 @@ async def index(
             cache.expire(str(request.query_params), 86400)
             return card_dicts
         
-@app.post("/")
-@limiter.limit("15/minute")
-async def index(request: Request, db: Session = Depends(get_db), cache: Union[Redis, None] = Depends(get_redis)):
-    cards_in_collection = await request.json()
-    cached_response = cache.get(str(request.query_params))
-    if cached_response:
-        return json.loads(cached_response)
-    else:
-        query_finales = []
-        for card in cards_in_collection:
-            query = db.query(models.Card).filter(
-                models.Card.id == card['CARDID'],
-                models.Card.season == card['SEASON'],
-                models.Card.cardcategory == card['CATEGORY']
-            )
-            query_finales.extend(query.all())
-        return query_finales
+# @app.post("/")
+# @limiter.limit("15/minute")
+# async def index(request: Request, db: Session = Depends(get_db), cache: Union[Redis, None] = Depends(get_redis)):
+#     cards_in_collection = await request.json()
+#     cached_response = cache.get(str(request.query_params))
+#     if cached_response:
+#         return json.loads(cached_response)
+#     else:
+#         query_finales = []
+#         for card in cards_in_collection:
+#             query = db.query(models.Card).filter(
+#                 models.Card.id == card['CARDID'],
+#                 models.Card.season == card['SEASON'],
+#                 models.Card.cardcategory == card['CATEGORY']
+#             )
+#             query_finales.extend(query.all())
+#         return query_finales

@@ -59,7 +59,7 @@ export function Query() {
     useEffect(() => {
         async function fetcher() {
             try {
-                let baseString = window.location.href.replace(`${process.env.NEXT_PUBLIC_SITE}/query`, 'http://127.0.0.1:8000/')
+                let baseString = window.location.href.replace(`${process.env.NEXT_PUBLIC_SITE}/query`, 'https://nscards.up.railway.app/cards')
                 let collectionCards: any[] = []
                 let deckCards: any[] = []
                 let collectionParam: string | string[] | null = searchParams.get('collection')
