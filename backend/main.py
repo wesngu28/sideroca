@@ -65,7 +65,7 @@ class CardSchema(BaseModel):
     trophies: Union[list, dict]
 
 @app.get("/cards")
-@limiter.limit("500/minute")
+@limiter.limit("30/minute")
 async def index(
     request: Request,
     db: Session = Depends(get_db),

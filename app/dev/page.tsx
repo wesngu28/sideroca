@@ -13,7 +13,7 @@ export default function Dev() {
                 Stack
             </h2>
             <div className="space-y-10 sm:grid sm:grid-flow-col sm:grid-cols-2 sm:grid-rows-3 sm:gap-x-6 sm:gap-y-14 sm:space-y-0 md:grid-cols-3 md:grid-rows-2 lg:gap-x-8">
-                <div className="relative flex flex-col justify-between rounded bg-white/5 transition-colors hover:border-purple-200">
+                <div className="relative flex flex-col justify-between rounded-lg border bg-card text-card-foreground shadow-sm transition-colors hover:border-purple-200">
                     <div className="flex items-center bg-white/10 p-2 pl-5 transition-colors hover:bg-white/5">
                         <a href="https://nextjs.org/" target="_blank" rel="noopener noreferrer" 
                             className="text-lg font-medium leading-6 md:text-xl h-full rounded-md before:absolute before:inset-0 before:content-[''] focus:no-underline hover:no-underline active:no-underline">
@@ -25,8 +25,8 @@ export default function Dev() {
                         the latest React features, and integrating powerful Rust-based JavaScript tooling for the fastest builds.
                     </div>
                 </div>
-                <div className="relative flex flex-col justify-between rounded bg-white/5 transition-colors hover:border-purple-200">
-                    <div className="flex items-center bg-white/10 p-2 pl-5 transition-colors hover:bg-white/5">
+                <div className="relative flex flex-col justify-between rounded-lg border bg-card text-card-foreground shadow-sm transition-colors hover:border-purple-200">
+                    <div className="flex items-center bg-white/10 p-2 pl-5 transition-colors hover:bg-white/5 ">
                         <a href="https://fastapi.tiangolo.com/" target="_blank" rel="noopener noreferrer" 
                             className="text-lg font-medium leading-6 md:text-xl h-full rounded-md before:absolute before:inset-0 before:content-[''] focus:no-underline hover:no-underline active:no-underline">
                             FastAPI
@@ -36,7 +36,7 @@ export default function Dev() {
                         FastAPI is a modern, fast (high-performance), web framework for building APIs with Python 3.7+ based on standard Python type hints.
                     </div>
                 </div>
-                <div className="relative flex flex-col justify-between rounded bg-white/5 transition-colors hover:border-purple-200">
+                <div className="relative flex flex-col justify-between rounded-lg border bg-card text-card-foreground shadow-sm transition-colors hover:border-purple-200">
                     <div className="flex items-center bg-white/10 p-2 pl-5 transition-colors hover:bg-white/5">
                         <a href="https://tailwindcss.com/" target="_blank" rel="noopener noreferrer" 
                         className="text-lg font-medium leading-6 md:text-xl h-full rounded-md before:absolute before:inset-0 before:content-[''] focus:no-underline hover:no-underline active:no-underline">
@@ -48,7 +48,7 @@ export default function Dev() {
                         any design, directly in your markup.
                     </div>
                 </div>
-                <div className="relative flex flex-col justify-between rounded bg-white/5 transition-colors hover:border-purple-200">
+                <div className="relative flex flex-col justify-between rounded-lg border bg-card text-card-foreground shadow-sm transition-colors hover:border-purple-200">
                     <div className="flex items-center bg-white/10 p-2 pl-5 transition-colors hover:bg-white/5">
                         <a href="https://ui.shadcn.com/" target="_blank" rel="noopener noreferrer" 
                         className="text-lg font-medium leading-6 md:text-xl h-full rounded-md before:absolute before:inset-0 before:content-[''] focus:no-underline hover:no-underline active:no-underline">
@@ -59,7 +59,7 @@ export default function Dev() {
                     Beautifully designed components that you can copy and paste into your apps. Accessible. Customizable. Open Source.
                     </div>
                 </div>
-                <div className="relative flex flex-col justify-between rounded bg-white/5 transition-colors hover:border-purple-200">
+                <div className="relative flex flex-col justify-between rounded-lg border bg-card text-card-foreground shadow-sm transition-colors hover:border-purple-200">
                     <div className="flex items-center bg-white/10 p-2 pl-5 transition-colors hover:bg-white/5">
                         <a href="https://tailwindcss.com/" target="_blank" rel="noopener noreferrer" 
                         className="text-lg font-medium leading-6 md:text-xl h-full rounded-md before:absolute before:inset-0 before:content-[''] focus:no-underline hover:no-underline active:no-underline">
@@ -70,7 +70,7 @@ export default function Dev() {
                         TypeScript is a strongly typed programming language that builds on JavaScript, giving you better tooling at any scale.
                     </div>
                 </div>
-                <div className="relative flex flex-col justify-between rounded bg-white/5 transition-colors hover:border-purple-200">
+                <div className="relative flex flex-col justify-between rounded-lg border bg-card text-card-foreground shadow-sm transition-colors hover:border-purple-200">
                     <div className="flex items-center bg-white/10 p-2 pl-5 transition-colors hover:bg-white/5">
                         <a href="https://railway.app/" target="_blank" rel="noopener noreferrer" 
                         className="text-lg font-medium leading-6 md:text-xl h-full rounded-md before:absolute before:inset-0 before:content-[''] focus:no-underline hover:no-underline active:no-underline">
