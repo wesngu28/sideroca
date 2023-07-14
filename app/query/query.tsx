@@ -138,7 +138,7 @@ export function Query() {
     }, [searchParams])
     return (
         <main className="flex min-h-screen flex-col items-center p-12">
-            <a href="/">
+           <a href="/">
                 <Button variant={"outline"}
                     data-umami-event="Make New Query" className="text-white transition duration-500 bg-blue-700 hover:bg-blue-600 mb-8">
                     New Query
@@ -171,11 +171,11 @@ export function Query() {
                                     {currentItems.map((card, i) => <p key={i}>{card.name}</p>)}
                                 </div>
                                 :
-                                currentItems.map(card =>
+                                currentItems.map((card, i) =>
                                     card.season !== 3 ? (
-                                        <S1S2Card key={card.id} card={card} />
+                                        <S1S2Card key={`${card.name}-${card.season}`} card={card} />
                                     ) : (
-                                        <S3Card key={card.id} card={card} />
+                                        <S3Card key={`${card.name}-${card.season}`} card={card} />
                                     )
                                 )
                             }
@@ -183,7 +183,7 @@ export function Query() {
                     </div>
                 </>
                 : <p className='dark:text-white text-lg font-bold mb-2'>Generating cards for {lastQuery}, please wait...</p>}
-            {errorMessage && <p className="text-red-500">{errorMessage}</p>}
-        </main>
+                {errorMessage && <p className="text-red-500">{errorMessage}</p>}
+            </main>
     )
 }
