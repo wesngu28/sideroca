@@ -35,7 +35,7 @@ def get_limiter_key(request: Request):
     limiter_key = re.sub(r":{1,}", ":", re.sub(r"/{1,}", ":", limiter_prefix + current_key))
     return limiter_key
 
-limiter = Limiter(key_func=get_limiter_key, storage_uri=f"{os.environ['REDIS_URL']}/1")
+limiter = Limiter(key_func=get_limiter_key, storage_uri=f"redis://default:chJIfncOd5RYwFmhZ05Q@containers-us-west-23.railway.app:7203/1")
 app = FastAPI()
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
@@ -63,6 +63,10 @@ class CardSchema(BaseModel):
     description: str
     badges: Union[list, dict]
     trophies: Union[list, dict]
+
+@app.get("/")
+def redirectHome():
+    return RedirectResponse("https://cardqueries.vercel.app")
 
 @app.get("/cards")
 @limiter.limit("30/minute")
