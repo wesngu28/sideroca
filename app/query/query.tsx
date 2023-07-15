@@ -190,19 +190,17 @@ export function Query() {
                     deckCards = cards.CARDS.DECK.CARD
                 }
                 if (collectionCards.length > 0 && deckCards.length > 0) {
-                    console.log(deckCards)
-                    console.log(collectionCards)
                     const cardsNotInCollection = deckCards.filter((card) => {
                         return !collectionCards.some((collectionCard) => collectionCard.CARDID === card.CARDID);
                     });
                     const getCards = await fetch('/api/collection', {
-                        body: JSON.stringify({ "url": baseString, "cards": cardsNotInCollection }),
+                        body: JSON.stringify({ "url": `${process.env.NEXT_PUBLIC_API}/collection${baseString}`, "cards": cardsNotInCollection }),
                         method: "POST"
                     })
                     cardList = await getCards.json()
                 }
                 const getCards = await fetch('/api', {
-                    body: baseString,
+                    body: `${process.env.NEXT_PUBLIC_API}/cards${baseString}`,
                     method: "POST"
                 })
                 let cardsJson = await getCards.json()
