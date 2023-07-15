@@ -3,6 +3,7 @@ import re
 import os
 import json
 from fastapi import FastAPI, Depends, Request
+from starlette.responses import RedirectResponse
 from pydantic import BaseModel, create_model
 from sqlalchemy import or_, and_, select
 from sqlalchemy.orm import Session
@@ -147,7 +148,7 @@ async def index(
         )
 
         if (mode):
-            res_names = {"cards": [{"id": card.id, "name": card.name, "season": card.season} for card in query_finales.with_entities(models.Card.name, models.Card.id).all()]}
+            res_names = {"cards": [{"id": card.id, "name": card.name, "season": card.season} for card in query_finales.with_entities(models.Card.name, models.Card.id, models.Card.season).all()]}
             cache.set(str(request.query_params), json.dumps(res_names))
             cache.expire(str(request.query_params), 86400)
             return res_names
