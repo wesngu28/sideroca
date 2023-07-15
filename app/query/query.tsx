@@ -138,10 +138,17 @@ export function Query() {
                         })
                         setQueryTracker((prevQueryTracker) => {
                             const now = new Date()
-                            if (now.getTime() > JSON.parse(localStorage.getItem('nsqueries')!).expiration) {
+                            const storedTime = localStorage.getItem('nsqueries')
+                            if (storedTime && now.getTime() > JSON.parse(localStorage.getItem('nsqueries')!).expiration) {
                                 const expirationDate = new Date().getTime() + 30000;
                                 localStorage.setItem('nsqueries', JSON.stringify({ value: 0, expiration: expirationDate }));
                                 return 0
+                            }
+                            if (storedTime) {
+                                const updatedQueryTracker = JSON.parse(storedTime).value + 1;
+                                const expirationDate = new Date().getTime() + 30000;
+                                localStorage.setItem('nsqueries', JSON.stringify({ value: updatedQueryTracker, expiration: expirationDate }));
+                                return Number(updatedQueryTracker)
                             }
                             const updatedQueryTracker = prevQueryTracker + 1;
                             const expirationDate = new Date().getTime() + 30000;
@@ -171,10 +178,17 @@ export function Query() {
                     })
                     setQueryTracker((prevQueryTracker) => {
                         const now = new Date()
-                        if (now.getTime() > JSON.parse(localStorage.getItem('nsqueries')!).expiration) {
+                        const storedTime = localStorage.getItem('nsqueries')
+                        if (storedTime && now.getTime() > JSON.parse(localStorage.getItem('nsqueries')!).expiration) {
                             const expirationDate = new Date().getTime() + 30000;
                             localStorage.setItem('nsqueries', JSON.stringify({ value: 0, expiration: expirationDate }));
                             return 0
+                        }
+                        if (storedTime) {
+                            const updatedQueryTracker = JSON.parse(storedTime).value + 1;
+                            const expirationDate = new Date().getTime() + 30000;
+                            localStorage.setItem('nsqueries', JSON.stringify({ value: updatedQueryTracker, expiration: expirationDate }));
+                            return Number(updatedQueryTracker)
                         }
                         const updatedQueryTracker = prevQueryTracker + 1;
                         const expirationDate = new Date().getTime() + 30000;
@@ -198,26 +212,27 @@ export function Query() {
                         method: "POST"
                     })
                     cardList = await getCards.json()
+                } else {
+                    const getCards = await fetch('/api', {
+                        body: `${process.env.NEXT_PUBLIC_API}/cards${baseString}`,
+                        method: "POST"
+                    })
+                    let cardsJson = await getCards.json()
+                    cardList = await Promise.all((cardsJson.cards as Card[]).map(async (nation) => {
+                        let inCollection = undefined;
+                        if (collectionCards.length > 0) {
+                            inCollection = collectionCards.some(
+                                (collectionCard: { CARDID: any }) => collectionCard.CARDID === Number(nation.id)
+                            );
+                        }
+                        if (deckCards.length > 0) {
+                            inCollection = deckCards.some(
+                                (collectionCard: { CARDID: any }) => collectionCard.CARDID === Number(nation.id)
+                            );
+                        }
+                        return { ...nation, inCollection };
+                    }));
                 }
-                const getCards = await fetch('/api', {
-                    body: `${process.env.NEXT_PUBLIC_API}/cards${baseString}`,
-                    method: "POST"
-                })
-                let cardsJson = await getCards.json()
-                cardList = await Promise.all((cardsJson.cards as Card[]).map(async (nation) => {
-                    let inCollection = undefined;
-                    if (collectionCards.length > 0) {
-                        inCollection = collectionCards.some(
-                            (collectionCard: { CARDID: any }) => collectionCard.CARDID === Number(nation.id)
-                        );
-                    }
-                    if (deckCards.length > 0) {
-                        inCollection = deckCards.some(
-                            (collectionCard: { CARDID: any }) => collectionCard.CARDID === Number(nation.id)
-                        );
-                    }
-                    return { ...nation, inCollection };
-                }));
                 cardList = cardList.sort((a, b) => {
                     if (a.inCollection && !b.inCollection) return 1;
                     if (!a.inCollection && b.inCollection) return -1;

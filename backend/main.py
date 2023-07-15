@@ -89,8 +89,7 @@ async def index(
     if all(value is None for value in request.query_params.keys()):
         return {"cards": []}
     cached_response = cache.get(str(request.query_params))
-    if cached_response == 'washman':
-        print ('cached')
+    if cached_response:
         return json.loads(cached_response)
     else:
         sans_queries = []
