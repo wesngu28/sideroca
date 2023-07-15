@@ -211,7 +211,7 @@ export function Query() {
                         body: JSON.stringify({ "url": `${process.env.NEXT_PUBLIC_API}/collection${baseString}`, "cards": cardsNotInCollection }),
                         method: "POST"
                     })
-                    cardList = await getCards.json()
+                    cardList = (await getCards.json()).cards
                 } else {
                     const getCards = await fetch('/api', {
                         body: `${process.env.NEXT_PUBLIC_API}/cards${baseString}`,

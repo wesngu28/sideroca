@@ -1,3 +1,7 @@
+import hashlib
+import re
+import os
+import json
 from fastapi import FastAPI, Depends, Request
 from pydantic import BaseModel, create_model
 from sqlalchemy import or_, and_, select
@@ -8,14 +12,12 @@ from typing import Union
 import redis
 from redis import Redis
 from cache import pool
-import json
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
-import hashlib
-import re
-import os
+from dotenv import load_dotenv 
 
+load_dotenv()
 models.Base.metadata.create_all(bind=engine)
 
 def get_limiter_key(request: Request):
@@ -171,4 +173,7 @@ async def index(request: Request, db: Session = Depends(get_db), cache: Union[Re
                 models.Card.cardcategory == card['CATEGORY']
             )
             query_finales.extend(query.all())
-        return query_finales
+        card_dicts = {"cards": [{key: getattr(card, key) for key in card.__table__.columns.keys()} for card in query_finales] }
+        cache.set(str(request.query_params), json.dumps(card_dicts))
+        cache.expire(str(request.query_params), 86400)
+        return card_dicts

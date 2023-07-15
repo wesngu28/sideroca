@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { AlertTriangle, Home } from "lucide-react";
 import Link from "next/link";
 import { flags, trophiesDict } from "../(helpers)/categories";
-import { badges, governments, trophies } from "../categories";
+import { badges, governments } from "../categories";
 
 export default function Docs() {
     return (
@@ -18,11 +18,15 @@ export default function Docs() {
                     grants access to the dumps which are stored in a PostgreSQL database. At the moment, manually building queries
                     offers more access than the interface.
                 </p>
-                <h2 className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0">
-                    Route
+                <h2 className="scroll-m-20 border-b text-3xl font-semibold tracking-tight transition-colors first:mt-0">
+                    Routes
                 </h2>
+                <div className="flex gap-4 pb-2">
+                <a href="#cards" className="transition-colors duration-300 hover:text-blue-700 leading-7">/cards</a>
+                <a href="#collection" className="transition-colors duration-300 hover:text-blue-700 leading-7">/collection</a>
+                </div>
                 <div>
-                    <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
+                    <h3 id="cards" className="scroll-m-20 text-2xl font-semibold tracking-tight">
                         /cards
                     </h3>
                     <p className="leading-7 [&:not(:first-child)]:mt-6">
@@ -89,19 +93,19 @@ export default function Docs() {
                     </h4>
                    <div className="my-2">
                         <pre>
-                            ?cardcategory=rare&category=authoritarian_democracy
+                            /cards?cardcategory=rare&category=authoritarian_democracy
                         </pre>
                         <p>Gets all rare cards that are authoritiarian democracies</p>
                     </div>
                     <div className="my-2">
                         <pre>
-                            ?trophies=civil_rights&badge=admin
+                            /cards?trophies=civil_rights&badge=admin
                         </pre>
                         <p>Gets all nations with a civil rights badge that are administrators.</p>
                     </div>
                     <div className="my-2">
                         <pre>
-                            ?season=1&region=the_burning_legion&deck=Kractero
+                            /cards?season=1&region=the_burning_legion&deck=Kractero
                         </pre>
                         <p>Gets all season 1 cards from the region The Burning Legion, matched against the deck of Kractero.</p>
                     </div>
@@ -165,6 +169,31 @@ export default function Docs() {
                         <li>Type - The manually changeable type category</li>
                         <p className="ml-6 my-2">Format: type=kingdom</p>
                     </ul>
+                    <h3 id="#collection" className="scroll-m-20 text-2xl font-semibold tracking-tight">
+                        /collection
+                    </h3>
+                    <p className="leading-7 [&:not(:first-child)]:mt-6">
+                        A secondary route, the purpose of this route is to take one or multiple collections, and compare it against
+                        the cards in your deck.
+                    </p>
+                    <h4 className="scroll-m-20 text-xl font-semibold tracking-tight mt-6">
+                        Exposed Parameters
+                    </h4>
+                    <ul className="my-3 ml-6 list-disc [&>li]:mt-4">
+                        <li>Deck - Takes one parameter, a nation name</li>
+                        <li>Collection - Takes a collection parameter, with additional ones possible separated by commas</li>
+                    </ul>
+                    <h4 className="scroll-m-20 text-xl font-semibold tracking-tight mt-6 text-center">
+                        Sample Queries
+                    </h4>
+                   <div className="my-2">
+                        <pre>
+                            /collection?collection=3293,67193&deck=Kractero
+                        </pre>
+                        <p>Collects cards from the 3293 and 67193 collection, then returns all the cards from Kractero's Deck 
+                            that are not included within those collections.
+                        </p>
+                    </div>
                 </div>
             </div>
         </main>
