@@ -145,7 +145,7 @@ async def index(
         )
 
         if (mode):
-            res_names = {"cards": [{"id": card.id, "name": card.name} for card in query_finales.with_entities(models.Card.name, models.Card.id).all()]}
+            res_names = {"cards": [{"id": card.id, "name": card.name, "season": card.season} for card in query_finales.with_entities(models.Card.name, models.Card.id).all()]}
             cache.set(str(request.query_params), json.dumps(res_names))
             cache.expire(str(request.query_params), 86400)
             return res_names
