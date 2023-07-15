@@ -6,11 +6,20 @@ import { S1S2Card } from '../(components)/S1S2Card'
 import { Card } from '../(helpers)/models'
 import { useSearchParams } from "next/navigation"
 import { XMLParser } from 'fast-xml-parser'
-import ReactPaginate from 'react-paginate';
 import { Button } from '@/components/ui/button'
-import { Download, Home } from 'lucide-react'
-import { Pagination } from '@mantine/core';
+import { Download, Home, SortDesc } from 'lucide-react'
+import { Pagination, createEmotionCache } from '@mantine/core';
 import { MantineProvider } from '@mantine/core'
+import {
+    DropdownMenu,
+    DropdownMenuCheckboxItem,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { rarityOrder } from '../(helpers)/categories'
 
 function downloadCSV(data: Card[], filename: string) {
     const csvData = convertJSONToCSV(data);
@@ -39,6 +48,8 @@ function convertJSONToCSV(jsonData: Card[]) {
     return csvRows.join('\n');
 }
 
+const appendCache = createEmotionCache({ key: 'mantine', prepend: false });
+
 export function Query() {
     const [queryTracker, setQueryTracker] = useState(0);
     const [correspondingJson, setCorrespondingJson] = useState<Array<Card>>([])
@@ -47,23 +58,66 @@ export function Query() {
     const lastQuery = searchParams.toString()
     const [itemOffset, setItemOffset] = useState(0);
     const [activePage, setActivePage] = useState(1);
+    const [sortValue, setSortValue] = useState("")
+    const [sortOrder, setSortOrder] = useState("Asc")
     const itemsPerPage = 50;
     const endOffset = itemOffset + itemsPerPage;
     const currentItems = correspondingJson.slice(itemOffset, endOffset);
     const pageCount = Math.ceil(correspondingJson.length / itemsPerPage);
-    
+
     const handlePageChange = (selectedPage: number) => {
-      const newOffset = (selectedPage - 1) * itemsPerPage;
-      setItemOffset(newOffset);
-      setActivePage(selectedPage);
+        const newOffset = (selectedPage - 1) * itemsPerPage;
+        setItemOffset(newOffset);
+        setActivePage(selectedPage);
     };
-    
+
     const handleDownload = () => {
         if (correspondingJson.length > 0) {
             const filename = `${lastQuery}.csv`;
             downloadCSV(correspondingJson, filename);
         }
     };
+
+    function sorter(a: Card, b: Card): number {
+        if (sortOrder === "Asc") {
+            if (sortValue === "Name") {
+                if (a.name === b.name) return 0;
+                return a.name > b.name ? 1 : -1;
+            } else if (sortValue === "Rarity") {
+                const rarityA = rarityOrder[a.cardcategory];
+                const rarityB = rarityOrder[b.cardcategory];
+                if (rarityA === rarityB) return 0;
+                return rarityA > rarityB ? 1 : -1;
+            } else {
+                if (a.id === b.id) return 0;
+                return a.id > b.id ? 1 : -1;
+            }
+        } else {
+            if (sortValue === "Name") {
+                if (b.name === a.name) return 0;
+                return b.name > a.name ? 1 : -1;
+            } else if (sortValue === "Rarity") {
+                const rarityA = rarityOrder[a.cardcategory];
+                const rarityB = rarityOrder[b.cardcategory];
+                if (rarityB === rarityA) return 0;
+                return rarityB > rarityA ? 1 : -1;
+            } else {
+                if (b.id === a.id) return 0;
+                return b.id > a.id ? 1 : -1;
+            }
+        }
+    }
+
+    useEffect(() => {
+        setCorrespondingJson([...correspondingJson].sort((a, b) => {
+            if (a.inCollection && !b.inCollection) return 1;
+            if (!a.inCollection && b.inCollection) return -1;
+            if (a.inCollection && b.inCollection) {
+                return sorter(a, b)
+            }
+            return sorter(a, b)
+        }))
+    }, [sortOrder, sortValue])
 
     useEffect(() => {
         async function fetcher() {
@@ -183,7 +237,7 @@ export function Query() {
         fetcher()
     }, [searchParams])
     return (
-        <MantineProvider>
+        <MantineProvider emotionCache={appendCache}>
             <div className='flex gap-4'>
                 <a href="/">
                     <Button variant={"outline"}
@@ -204,18 +258,21 @@ export function Query() {
                 <>
                     <p className='dark:text-white text-lg font-bold mb-2'>?{lastQuery}</p>
                     <div className='flex flex-col flex-wrap items-center gap-4 dark:text-white'>
-                        <Pagination value={activePage} onChange={handlePageChange} total={pageCount} />
-                        {/* <ReactPaginate
-                            className='flex py-1 mt-4 mb-8 text-white
-                                [&>li>a]:p-3 [&>li>a]:border-gray-800 [&>li>a]:bg-blue-700 [&>li>a]:border-solid [&>li>a]:border [&>li>a]:cursor-pointer'
-                            breakLabel="..."
-                            nextLabel="Next"
-                            onPageChange={handlePageClick}
-                            pageRangeDisplayed={5}
-                            pageCount={pageCount}
-                            previousLabel="Previous"
-                            renderOnZeroPageCount={null}
-                        /> */}
+                        <div className='flex gap-4 mt-4'>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger><SortDesc /></DropdownMenuTrigger>
+                                <DropdownMenuContent>
+                                    <DropdownMenuLabel>Sort By</DropdownMenuLabel>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuCheckboxItem onCheckedChange={() => setSortOrder("Asc")} checked={sortOrder === "Asc" ? true : false}>Asc</DropdownMenuCheckboxItem>
+                                    <DropdownMenuCheckboxItem onCheckedChange={() => setSortOrder("Desc")} checked={sortOrder === "Desc" ? true : false}>Desc</DropdownMenuCheckboxItem>
+                                    <DropdownMenuItem onSelect={() => setSortValue('ID')}>Card ID</DropdownMenuItem>
+                                    <DropdownMenuItem onSelect={() => setSortValue('Rarity')}>Rarity</DropdownMenuItem>
+                                    <DropdownMenuItem onSelect={() => setSortValue('Name')}>Name</DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                            <Pagination style={{ backgroundColor: "fff" }} value={activePage} onChange={handlePageChange} total={pageCount} />
+                        </div>
                         <div className='flex flex-wrap justify-center'>
                             {!correspondingJson[0].motto ?
                                 <div className='flex flex-col dark:text-white'>

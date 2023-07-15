@@ -117,7 +117,6 @@ export const governments = [
   'Scandinavian Liberal Paradise',
   'Tyranny by Majority'
 ]
-
 export const flags = [
   'Aaland Islands',
   "Afghanistan",
@@ -400,7 +399,6 @@ export const flags = [
   "Zanzibar",
   "Zimbabwe",
 ];
-
 export const banners: { [key: string]: string } = {
     "Admin": "mod_status",
     "Game Mod": "mod_status",
@@ -450,7 +448,6 @@ export const badgesDict: { [key: string]: string } = {
     "Moderator": "mod",
     "Site Supporter": "acc_supporter_bronze"
 }
-
 export const trophiesDict: {[key: string]: string} = {
     'wealth gaps': 'wealthgaps',
     'international artwork': 'deck',
@@ -538,4 +535,12 @@ export const trophiesDict: {[key: string]: string} = {
     lifespan: 'life',
     'income equality': 'equality',
     'no trophies': 'no_badge'
+};
+export const rarityOrder: {[key: string]: number} = {
+  common: 1,
+  uncommon: 2,
+  rare: 3,
+  'ultra-rare': 4,
+  epic: 5,
+  legendary: 6
 };
