@@ -122,7 +122,7 @@ export function Query() {
     useEffect(() => {
         async function fetcher() {
             try {
-                let baseString = window.location.href.replace(`${process.env.NEXT_PUBLIC_SITE}/query`, `${process.env.NEXT_PUBLIC_API}/cards`)
+                let baseString = window.location.href.replace(`${process.env.NEXT_PUBLIC_SITE}/query`, '')
                 let cardList: Card[] = []
                 let collectionCards: any[] = []
                 let deckCards: any[] = []
