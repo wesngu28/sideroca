@@ -190,7 +190,7 @@ export default function Docs() {
                         <pre>
                             /collection?collection=3293,67193&deck=Kractero
                         </pre>
-                        <p>Collects cards from the 3293 and 67193 collection, then returns all the cards from Kractero's Deck 
+                        <p>Collects cards from the 3293 and 67193 collection, then returns all the cards from Kractero&apos;s Deck 
                             that are not included within those collections.
                         </p>
                     </div>
