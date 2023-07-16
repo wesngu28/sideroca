@@ -120,6 +120,7 @@ export function Query() {
     }, [sortOrder, sortValue])
 
     useEffect(() => {
+        const abortController = new AbortController();
         async function fetcher() {
             try {
                 let baseString = window.location.href.replace(`${process.env.NEXT_PUBLIC_SITE}/query`, '')
@@ -172,6 +173,7 @@ export function Query() {
                 }
                 if (deckParam) {
                     const cardsReq = await fetch(`https://www.nationstates.net/cgi-bin/api.cgi?q=cards+${`deck;nationname=${deckParam}`}`, {
+                        signal: abortController.signal,
                         headers: {
                             'User-Agent': "Kractero card queries"
                         }
@@ -208,12 +210,14 @@ export function Query() {
                         return !collectionCards.some((collectionCard) => collectionCard.CARDID === card.CARDID);
                     });
                     const getCards = await fetch('/api/collection', {
+                        signal: abortController.signal,
                         body: JSON.stringify({ "url": `${process.env.NEXT_PUBLIC_API}/collection${baseString}`, "cards": cardsNotInCollection }),
                         method: "POST"
                     })
                     cardList = (await getCards.json()).cards
                 } else {
                     const getCards = await fetch('/api', {
+                        signal: abortController.signal,
                         body: `${process.env.NEXT_PUBLIC_API}/cards${baseString}`,
                         method: "POST"
                     })
@@ -248,6 +252,9 @@ export function Query() {
             }
         }
         fetcher()
+        return () => {
+            abortController.abort();
+          };
     }, [searchParams])
     return (
         <MantineProvider emotionCache={appendCache}>
