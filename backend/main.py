@@ -87,8 +87,11 @@ async def index(
     cardcategory: str | None = None,
     badges: str | None = None,
     trophies: str | None = None,
-    mode: str | None = None
+    mode: str | None = None,
+    rarity: str | None = None
 ):
+    if rarity:
+        cardcategory = rarity
     if all(value is None for value in request.query_params.keys()):
         return {"cards": []}
     cached_response = cache.get(str(request.query_params))
@@ -147,16 +150,27 @@ async def index(
                 *and_badges_queries if and_badges_queries is not None else True,
         )
 
-        if (mode):
-            res_names = {"cards": [{"id": card.id, "name": card.name, "season": card.season} for card in query_finales.with_entities(models.Card.name, models.Card.id, models.Card.season).all()]}
+        if (season is not None or (cardcategory is not None and cardcategory != 'legendary')) and all(value is None for value in (name, type, motto, category, region, flag, badges, trophies)):
+            mode = "names"
+        
+        if (mode is not None and mode == "names"):
+            query_finales = query_finales.with_entities(models.Card.name, models.Card.id, models.Card.season).all()
+            res_names = {"cards": [(card.name, card.id, card.season) for card in query_finales]}
             cache.set(str(request.query_params), json.dumps(res_names))
-            cache.expire(str(request.query_params), 86400)
+            cache.expire(str(request.query_params), 3600)
             return res_names
         else:
-            card_dicts = {"cards": [{key: getattr(card, key) for key in card.__table__.columns.keys()} for card in query_finales.all()] }
-            cache.set(str(request.query_params), json.dumps(card_dicts))
-            cache.expire(str(request.query_params), 86400)
-            return card_dicts
+            query_finales = query_finales.all()
+            card_dicts = {"cards": [{key: getattr(card, key) for key in card.__table__.columns.keys()} for card in query_finales]}
+            if len(card_dicts["cards"]) > 12000:
+                filtered_card_dicts = {"cards": [{"name": card['name'], "id": card['id'], "season": card['season']} for card in card_dicts['cards']]}
+                cache.set(str(request.query_params), json.dumps(filtered_card_dicts))
+                cache.expire(str(request.query_params), 3600)
+                return filtered_card_dicts
+            else:
+                cache.set(str(request.query_params), json.dumps(card_dicts))
+                cache.expire(str(request.query_params), 3600)
+                return card_dicts
         
 @app.post("/collection")
 @limiter.limit("30/minute")
@@ -176,5 +190,5 @@ async def index(request: Request, db: Session = Depends(get_db), cache: Union[Re
             query_finales.extend(query.all())
         card_dicts = {"cards": [{key: getattr(card, key) for key in card.__table__.columns.keys()} for card in query_finales] }
         cache.set(str(request.query_params), json.dumps(card_dicts))
-        cache.expire(str(request.query_params), 86400)
+        cache.expire(str(request.query_params), 3600)
         return card_dicts
