@@ -155,7 +155,7 @@ async def index(
         
         if (mode is not None and mode == "names"):
             query_finales = query_finales.with_entities(models.Card.name, models.Card.id, models.Card.season).all()
-            res_names = {"cards": [(card.name, card.id, card.season) for card in query_finales]}
+            res_names = {"cards": [{"name": card.name, "id": card.id, "season": card.season} for card in query_finales]}
             cache.set(str(request.query_params), json.dumps(res_names))
             cache.expire(str(request.query_params), 3600)
             return res_names
