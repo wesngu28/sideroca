@@ -19,33 +19,34 @@ import {
     PopoverTrigger,
 } from "@/components/ui/popover"
 
-interface Props { items: string[], name: string, idx?: number }
+interface Props { items: string[], name?: string, include?: boolean }
 
-export function ComboBox({ items, name, idx }: Props) {
+export function ComboBox({ items, name, include }: Props) {
     const [open, setOpen] = React.useState(false)
     const [value, setValue] = React.useState("")
 
     return (
         <>
-            <input className="hidden" name={idx ? `${name}${idx}` : name} value={value} type="hidden" />
+            <input className="hidden" name={include ? name : `!${name}`} value={value} type="hidden" />
+            <div className="flex flex-col gap-2">
             <Popover open={open} onOpenChange={setOpen}>
                 <PopoverTrigger asChild>
                     <Button
                         variant="outline"
                         role="combobox"
                         aria-expanded={open}
-                        className="w-[180px] justify-between button"
-                        name={name}
+                        className={`w-[180px] justify-between button ${include ? '' : 'border-red-600'}`}
+                        name={include ? name : `!${name}`}
                     >
                         {value
                             ? items.find(item => item.toLowerCase() === value)
-                            : `No ${name}`}
+                            : `No ${name && name.replace(/\d/g, "")}`}
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                     </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-[180px] p-0">
                     <Command>
-                        <CommandInput name={name} placeholder={`Search ${name}...`} />
+                        <CommandInput name={include ? name : `!${name}`} placeholder={`Search ${name}...`} />
                         <CommandEmpty>No {name} found.</CommandEmpty>
                         <CommandGroup>
                             {items.map((item) => (
@@ -62,7 +63,7 @@ export function ComboBox({ items, name, idx }: Props) {
                                             value === item ? "opacity-100" : "opacity-0"
                                         )}
                                     />
-                                    {item}
+                                    {item.replace(/\d/g, "")}
                                 </CommandItem>
                             ))}
                         </CommandGroup>
@@ -70,7 +71,7 @@ export function ComboBox({ items, name, idx }: Props) {
                 </PopoverContent>
             </Popover>
             {name === "trophies" && value && !value.includes('!') && <>
-                <RadioGroup className="flex" defaultValue="" name={`${value}%`}>
+                <RadioGroup className="flex" defaultValue="" name={`${include ? value : `!${value}`}%`}>
                     <div className="flex items-center space-x-2">
                         <RadioGroupItem value="1t" id="1st" />
                         <Label htmlFor="1st">1t</Label>
@@ -89,6 +90,7 @@ export function ComboBox({ items, name, idx }: Props) {
                     </div>
                 </RadioGroup>
             </>}
+            </div>
         </>
     )
 }

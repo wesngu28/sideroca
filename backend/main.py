@@ -114,11 +114,11 @@ async def index(
                     for value in values:
                         elements = value.split("|")
                         if len(values) == 1:
-                            and_badges.extend(elements)
+                            or_badges.extend(elements)
                             break
-                        or_badges.append(elements[0])
+                        and_badges.append(elements[0])
                         if len(elements) > 1:
-                            and_badges.append(elements[1])
+                            or_badges.append(elements[1])
                     format_or_badges = []
                     for badge in or_badges:
                         formatted_words = []
@@ -165,7 +165,7 @@ async def index(
                 match_queries.append(or_(*formatted_values))
 
         query_finales = db.query(models.Card).filter(
-                season is None or models.Card.season == str(season),
+                season is None or models.Card.season != str(season[1:]) if str(isinstance(season, str)) else models.Card.season == str(season),
                 *match_queries if match_queries is not None else True,
                 *sans_queries if sans_queries is not None else True,
                 or_(*or_badges_queries) if or_badges_queries is not None else True,

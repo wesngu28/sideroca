@@ -8,10 +8,10 @@ export default function Docs() {
     return (
         <main className="flex min-h-screen flex-col items-center p-12">
             <div className='mt-2 mb-10 text-center'>
-                <h1 className="text-7xl my-2 tracking-tight">Card <span className='text-blue-700'>Queries</span></h1>
+                <h1 className="text-7xl my-2 tracking-tight">Card <span className='text-purple-700'>Queries</span></h1>
                 <Link href="/"><Button className='rounded-md text-sm font-medium px-4 py-2 my-2'><Home /></Button></Link>
             </div>
-            <Link className="mt-3 mb-6 transition-colors duration-300 hover:text-blue-700" href="https://nscards.up.railway.app/cards">https://nscards.up.railway.app/cards</Link>
+            <Link className="mt-3 mb-6 transition-colors duration-300 hover:text-purple-700" href="https://nscards.up.railway.app/cards">https://nscards.up.railway.app/cards</Link>
             <div className="flex flex-col gap-8 max-w-[300px] phone:max-w-5xl">
                 <p className="leading-7 [&:not(:first-child)]:mt-6">
                     Card Queries is the frontend over an API made with FastAPI, a python library for making fast apis. The API
@@ -22,8 +22,8 @@ export default function Docs() {
                     Routes
                 </h2>
                 <div className="flex gap-4 pb-2">
-                <a href="#cards" className="transition-colors duration-300 hover:text-blue-700 leading-7">/cards</a>
-                <a href="#collection" className="transition-colors duration-300 hover:text-blue-700 leading-7">/collection</a>
+                <a href="#cards" className="transition-colors duration-300 hover:text-purple-700 leading-7">/cards</a>
+                <a href="#collection" className="transition-colors duration-300 hover:text-purple-700 leading-7">/collection</a>
                 </div>
                 <div>
                     <h3 id="cards" className="scroll-m-20 text-2xl font-semibold tracking-tight">
@@ -32,6 +32,27 @@ export default function Docs() {
                     <p className="leading-7 [&:not(:first-child)]:mt-6">
                         The main route and probably the one you want.
                     </p>
+                    <h4 className="scroll-m-20 text-xl font-semibold tracking-tight mt-12 text-center">
+                        Sample Queries
+                    </h4>
+                   <div className="my-2 break-words">
+                        <code>
+                            /cards?cardcategory=rare&category=authoritarian_democracy,civil_rights_lovefest
+                        </code>
+                        <p>Gets all rare cards that are authoritiarian democracies and civil rights lovefests.</p>
+                    </div>
+                    <div className="my-2">
+                        <code>
+                            /cards?trophies=civil_rights&badge=admin
+                        </code>
+                        <p>Gets all nations with a civil rights badge that are administrators.</p>
+                    </div>
+                    <div className="mb-12">
+                        <code>
+                            /cards?season=1&region=the_burning_legion&deck=Kractero
+                        </code>
+                        <p>Gets all season 1 cards from the region The Burning Legion, matched against the deck of Kractero.</p>
+                    </div>
                     <h4 className="scroll-m-20 text-xl font-semibold tracking-tight mt-6">
                         General Format
                     </h4>
@@ -66,49 +87,20 @@ export default function Docs() {
                         Exact Matching
                     </h4>
                     <p className="leading-7 [&:not(:first-child)]:mt-2">
-                        Some parameters only allow exact matching. The parameters that match exactly are
+                        Some parameters only allow exact matching. The parameters that match exactly are <span className="font-bold"> flag</span>,
                         <span className="font-bold"> cardcategory</span> (rarity), and WA<span className="font-bold"> category</span>.
                     </p>
-                    <h4 className="scroll-m-20 text-xl font-semibold tracking-tight mt-6">
-                        Or Parameters
-                    </h4>
-                    <p className="leading-7 [&:not(:first-child)]:mt-2">Some queries only support or. The queries
-                    that are only OR enabled are: querying for nation <span className="font-bold">name</span>, nation manual 
-                    <span className="font-bold"> type</span>, <span className="font-bold">region</span>, WA <span className="font-bold">category</span>,
-                    <span className="font-bold"> cardcategory </span>(rarity), <span className="font-bold"> flag</span>, and 
-                    <span className="font-bold"> motto</span>. This means passing in multiple flags, like flag=afghanistan,albania 
-                    will get all nations that have flag Afghanistan or Albania.</p>
                     <h4 className="scroll-m-20 text-xl font-semibold tracking-tight mt-6">
                         Variable Parameters
                     </h4>
                     <p className="leading-7 [&:not(:first-child)]:mt-2">
-                        Trophies and badges support variable matching (this has sketchy implementation).
+                        Trophies and badges support variable matching (this has sketchy implementation). By default, separating values with for trophies and badges with commas
+                        will have it perform an and match, and separating values with | will perform an or.
                     </p>
                     <pre className="mt-2">
                             trophies=happy-1,fat-5|bev-1
                     </pre>
                     This indicates all nations with happiness 1% and either obesity 5% or beverage sales industry at 1%.
-                    <h4 className="scroll-m-20 text-xl font-semibold tracking-tight mt-6 text-center">
-                        Sample Queries
-                    </h4>
-                   <div className="my-2">
-                        <pre>
-                            /cards?cardcategory=rare&category=authoritarian_democracy
-                        </pre>
-                        <p>Gets all rare cards that are authoritiarian democracies</p>
-                    </div>
-                    <div className="my-2">
-                        <pre>
-                            /cards?trophies=civil_rights&badge=admin
-                        </pre>
-                        <p>Gets all nations with a civil rights badge that are administrators.</p>
-                    </div>
-                    <div className="my-2">
-                        <pre>
-                            /cards?season=1&region=the_burning_legion&deck=Kractero
-                        </pre>
-                        <p>Gets all season 1 cards from the region The Burning Legion, matched against the deck of Kractero.</p>
-                    </div>
                     <h4 className="scroll-m-20 text-xl font-semibold tracking-tight mt-6">
                         Exposed Parameters
                     </h4>

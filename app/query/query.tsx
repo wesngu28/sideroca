@@ -55,7 +55,7 @@ export function Query() {
     const [correspondingJson, setCorrespondingJson] = useState<Array<Card>>([])
     const [errorMessage, setErrorMessage] = useState<string>("");
     const searchParams = useSearchParams()
-    const lastQuery = searchParams.toString()
+    const lastQuery = decodeURIComponent(searchParams.toString())
     const [itemOffset, setItemOffset] = useState(0);
     const [activePage, setActivePage] = useState(1);
     const [sortValue, setSortValue] = useState("")
@@ -64,6 +64,29 @@ export function Query() {
     const endOffset = itemOffset + itemsPerPage;
     const currentItems = correspondingJson.slice(itemOffset, endOffset);
     const pageCount = Math.ceil(correspondingJson.length / itemsPerPage);
+
+    function updateQueryTracker(prevQueryTracker: number): number {
+        const now = new Date();
+        const storedTime = localStorage.getItem('nsqueries');
+        
+        if (storedTime && now.getTime() > JSON.parse(storedTime).expiration) {
+          const expirationDate = new Date().getTime() + 30000;
+          localStorage.setItem('nsqueries', JSON.stringify({ value: 0, expiration: expirationDate }));
+          return 0;
+        }
+        
+        if (storedTime) {
+          const updatedQueryTracker = JSON.parse(storedTime).value + 1;
+          const expirationDate = new Date().getTime() + 30000;
+          localStorage.setItem('nsqueries', JSON.stringify({ value: updatedQueryTracker, expiration: expirationDate }));
+          return updatedQueryTracker;
+        }
+        
+        const updatedQueryTracker = prevQueryTracker + 1;
+        const expirationDate = new Date().getTime() + 30000;
+        localStorage.setItem('nsqueries', JSON.stringify({ value: updatedQueryTracker, expiration: expirationDate }));
+        return updatedQueryTracker;
+      }
 
     const handlePageChange = (selectedPage: number) => {
         const newOffset = (selectedPage - 1) * itemsPerPage;
@@ -125,10 +148,10 @@ export function Query() {
             try {
                 let baseString = window.location.href.replace(`${process.env.NEXT_PUBLIC_SITE}/query`, '')
                 let cardList: Card[] = []
-                let collectionCards: any[] = []
-                let deckCards: any[] = []
+                let collectionCards: Array<{CARDID: string, SEASON: number, CATEGORY: string}> = []
+                let deckCards: Array<{CARDID: string, SEASON: number, CATEGORY: string}> = []
                 let collectionParam: string | string[] | null = searchParams.get('collection')
-                let deckParam = searchParams.get('deck')
+                let deckParam: string | string[] | null = searchParams.get('deck')
                 if (collectionParam) {
                     collectionParam = collectionParam.split(',')
                     for (let collection of collectionParam) {
@@ -137,25 +160,7 @@ export function Query() {
                                 'User-Agent': "Kractero card queries"
                             }
                         })
-                        setQueryTracker((prevQueryTracker) => {
-                            const now = new Date()
-                            const storedTime = localStorage.getItem('nsqueries')
-                            if (storedTime && now.getTime() > JSON.parse(localStorage.getItem('nsqueries')!).expiration) {
-                                const expirationDate = new Date().getTime() + 30000;
-                                localStorage.setItem('nsqueries', JSON.stringify({ value: 0, expiration: expirationDate }));
-                                return 0
-                            }
-                            if (storedTime) {
-                                const updatedQueryTracker = JSON.parse(storedTime).value + 1;
-                                const expirationDate = new Date().getTime() + 30000;
-                                localStorage.setItem('nsqueries', JSON.stringify({ value: updatedQueryTracker, expiration: expirationDate }));
-                                return Number(updatedQueryTracker)
-                            }
-                            const updatedQueryTracker = prevQueryTracker + 1;
-                            const expirationDate = new Date().getTime() + 30000;
-                            localStorage.setItem('nsqueries', JSON.stringify({ value: updatedQueryTracker, expiration: expirationDate }));
-                            return updatedQueryTracker;
-                        });
+                        setQueryTracker((prevQueryTracker) => updateQueryTracker(prevQueryTracker));
                         const cardsText = await cardsReq.text()
                         const parser = new XMLParser()
                         let cards = parser.parse(cardsText)
@@ -163,47 +168,37 @@ export function Query() {
                             && !(cards.CARDS.DECK && cards.CARDS.DECK.CARD)) {
                             throw new Error("Something is wrong with the collection or deck you gave")
                         }
-                        cards.CARDS.COLLECTION.DECK.CARD.forEach((card: { CARDID: any }) => {
+                        cards.CARDS.COLLECTION.DECK.CARD.forEach((card: {CARDID: string, SEASON: number, CATEGORY: string}) => {
                             for (let obj of collectionCards) {
-                                if (obj.CARDID === card.CARDID) return
+                                if (obj.CARDID === card.CARDID && obj.SEASON === card.SEASON) return
                             }
                             collectionCards.push(card)
                         })
                     }
                 }
                 if (deckParam) {
-                    const cardsReq = await fetch(`https://www.nationstates.net/cgi-bin/api.cgi?q=cards+${`deck;nationname=${deckParam}`}`, {
-                        signal: abortController.signal,
-                        headers: {
-                            'User-Agent': "Kractero card queries"
+                    deckParam = deckParam.split(',')
+                    for (let deck of deckParam) {
+                        const cardsReq = await fetch(`https://www.nationstates.net/cgi-bin/api.cgi?q=cards+${`deck;nationname=${deck}`}`, {
+                            signal: abortController.signal,
+                            headers: {
+                                'User-Agent': "Kractero card queries"
+                            }
+                        })
+                        setQueryTracker((prevQueryTracker) => updateQueryTracker(prevQueryTracker));
+                        const cardsText = await cardsReq.text()
+                        const parser = new XMLParser()
+                        let cards = parser.parse(cardsText)
+                        if (!(cards.CARDS.DECK && cards.CARDS.DECK.CARD)) {
+                            throw new Error("Something is wrong with the collection or deck you gave")
                         }
-                    })
-                    setQueryTracker((prevQueryTracker) => {
-                        const now = new Date()
-                        const storedTime = localStorage.getItem('nsqueries')
-                        if (storedTime && now.getTime() > JSON.parse(localStorage.getItem('nsqueries')!).expiration) {
-                            const expirationDate = new Date().getTime() + 30000;
-                            localStorage.setItem('nsqueries', JSON.stringify({ value: 0, expiration: expirationDate }));
-                            return 0
-                        }
-                        if (storedTime) {
-                            const updatedQueryTracker = JSON.parse(storedTime).value + 1;
-                            const expirationDate = new Date().getTime() + 30000;
-                            localStorage.setItem('nsqueries', JSON.stringify({ value: updatedQueryTracker, expiration: expirationDate }));
-                            return Number(updatedQueryTracker)
-                        }
-                        const updatedQueryTracker = prevQueryTracker + 1;
-                        const expirationDate = new Date().getTime() + 30000;
-                        localStorage.setItem('nsqueries', JSON.stringify({ value: updatedQueryTracker, expiration: expirationDate }));
-                        return updatedQueryTracker;
-                    });
-                    const cardsText = await cardsReq.text()
-                    const parser = new XMLParser()
-                    let cards = parser.parse(cardsText)
-                    if (!(cards.CARDS.DECK && cards.CARDS.DECK.CARD)) {
-                        throw new Error("Something is wrong with the collection or deck you gave")
+                        cards.CARDS.DECK.CARD.forEach((card: {CARDID: string, SEASON: number, CATEGORY: string}) => {
+                            for (let obj of deckCards) {
+                                if (obj.CARDID === card.CARDID && obj.SEASON === card.SEASON) return
+                            }
+                            deckCards.push(card)
+                        })
                     }
-                    deckCards = cards.CARDS.DECK.CARD
                 }
                 if (collectionCards.length > 0 && deckCards.length > 0) {
                     const cardsNotInCollection = deckCards.filter((card) => {

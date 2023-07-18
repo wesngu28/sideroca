@@ -6,14 +6,15 @@ import { badges, flags, governments, trophies } from './(helpers)/categories'
 import { trophiesDict } from './(helpers)/categories'
 import { Dropdown } from './(components)/Dropdown'
 import { ComboBox } from './(components)/ComboBox'
-import { Input } from '@/components/ui/input'
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import FormItem from './(components)/FormItem'
 import { Clipboard, Trash } from 'lucide-react'
-import { MultipleInput } from './(components)/Input'
+import { MultipleInput } from './(components)/MultipleInput'
 import { Label } from '@/components/ui/label'
 import Link from 'next/link'
+import { SingleInput } from './(components)/SingleInput'
+import { Input } from '@/components/ui/input'
 
 export default function Home() {
 
@@ -28,12 +29,35 @@ export default function Home() {
     if (queries) setQueries(JSON.parse(queries))
   }, [])
 
+  function multipleInputQueryBuilder(formData: FormData, formKey: FormDataEntryValue | null, iterableKeys: string[], queryString: string[], paramStr: string) {
+    const keys = formKey ? iterableKeys.filter(key => key.includes(paramStr.replace(/\d+$/, '').replace('!', ''))) : [];
+    if (keys.length > 0) {
+      let paramValues = [`${paramStr.includes('!') ? paramStr.replace('!', '') : paramStr}=`]
+      for (const key of keys) {
+        const value = (formData.get(key) as string)!.replaceAll(' ', '_').replace(paramStr, '').toLowerCase();
+        if (value) paramValues.push(key.includes('!') || paramStr.includes('!') ? `!${value.toString()}` : value.toString())
+      }
+      queryString.push(paramValues.join(',').replace(',', ''))
+    }
+  }
+
   async function makeRequest(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
     const form = e.target as HTMLFormElement;
     const formData = new FormData(form);
     let query = ["?"]
+    const uniqueKeys: Set<string> = new Set();
+    const uniqueEntries: [string, FormDataEntryValue][] = [];
+    
     for (const [key, value] of Array.from(formData.entries())) {
+      const baseKey = key.replace(/\d+$/, '').replace('!', '');
+      if (!uniqueKeys.has(baseKey)) {
+        uniqueKeys.add(baseKey);
+        uniqueEntries.push([key, value]);
+      }
+    }
+    const keywords = ['season', 'region', 'trophies', 'badges', 'cardcategory', 'category', 'flag', 'motto', 'type', 'name'];
+    for (const [key, value] of uniqueEntries) {
       if (value) {
         if (key === 'manual') {
           queries.unshift(value.toString())
@@ -42,9 +66,14 @@ export default function Home() {
           router.push(`/query?${formData.get('manual')?.toString()}`)
           return
         }
-        if (key === 'season') value === 'all' ? "" : query.push(value.toString().replace(' ', '='))
-        if (key === 'region') query.push(`region=${value.toString().replaceAll(' ', '_').toLowerCase()}`)
-        if (key === 'cardcategory') query.push(`cardcategory=${value}`)
+        const iterableKeys = [...Array.from(formData.keys())]
+        if (keywords.some(keyword => key.includes(keyword))) {
+          if (key.includes('category') && key !== 'cardcategory') {
+            multipleInputQueryBuilder(formData, formData.get(key), iterableKeys, query, key.replace('!', ''));
+          } else if (value !== 'all') {
+            multipleInputQueryBuilder(formData, formData.get(key), iterableKeys, query, key.replace('!', ''));
+          }
+        }
         if (key === 'trophies') {
           const trophyKeys = value ? [...Array.from(formData.keys())].filter(key => key.includes('trophies') || key.includes('%')) : [];
           if (trophyKeys.length > 0) {
@@ -56,24 +85,8 @@ export default function Home() {
             query.push(trophies.join(',').replace(',', '').replaceAll(',-', '-'))
           }
         }
-        if (key === 'badges') {
-          const badgeKeys = formData.get('badges') ? [...Array.from(formData.keys())].filter(key => key.includes('badges')) : [];
-          if (badgeKeys.length > 0) {
-            let badges = ["badges="]
-            for (const key of badgeKeys) {
-              const badge = (formData.get(key) as string)!.replaceAll(' ', '_').toLowerCase();
-              if (badge) badges.push(`${badge}`)
-            }
-            query.push(badges.join(',').replace(',', ''))
-          }
-        }
-        if (key === 'category') query.push(`category=${value.toString().replaceAll(' ', '_').toLowerCase()}}`)
-        if (key === 'flag') query.push(`flag=${value}`)
-        if (key === 'motto') query.push(`motto=${value}`)
-        if (key === 'type') query.push(`type=${value}`)
+        if (key.includes(collectionType.toLowerCase())) multipleInputQueryBuilder(formData, formData.get(key.toLowerCase()), iterableKeys, query, key.toLowerCase());
         if (key === 'exnation') query.push(`exnation`)
-        if (key === 'name') query.push(`name=${value}`)
-        if (key === 'collection') query.push(`${collectionType.toLowerCase()}=${value}`)
       }
     }
 
@@ -88,30 +101,30 @@ export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center p-12">
       <div className='mt-2 mb-10 text-center'>
-        <h1 className="text-7xl my-2 tracking-tight">Card <span className='text-blue-700'>Queries</span></h1>
-        <Link href="/docs"><Button className='rounded-md text-sm font-medium px-4 py-2 my-2'>API Docs</Button></Link>
+        <h1 className="text-7xl my-2 tracking-tight">Card <span className='text-purple-700'>Queries</span></h1>
+        <Link className='h-full w-full' href="/docs"><Button className='rounded-md text-sm font-medium px-4 py-2 my-2'>API Docs</Button></Link>
       </div>
       <div className="relative flex flex-col">
         <form className='flex flex-col items-center' onSubmit={(e) => makeRequest(e)} name='card'>
           <p className='mb-6'>Enter your query manually, or fill out the form.</p>
           <Input className='mb-6 w-full' name="manual" />
           <FormItem label='Filter Season'>
-            <Dropdown name='season' items={["All", "Season 1", "Season 2", "Season 3"]} defindex={0} />
+            <MultipleInput name='season' max={2} child={<Dropdown items={["All", "Season 1", "Season 2", "Season 3"]} defindex={0} />} />
           </FormItem>
           <FormItem label='Pick Trophies'>
-            <MultipleInput categories={trophies} suggestions='trophies' />
+            <MultipleInput name='trophies' max={trophies.length - 1} child={<ComboBox items={trophies} />} />
           </FormItem>
           <FormItem label='Pick Badges'>
-            <MultipleInput categories={badges} suggestions='badges' />
+            <MultipleInput name='badges' max={badges.length} child={<ComboBox items={badges} />} />
           </FormItem>
           <FormItem label='WA Category'>
-            <ComboBox items={governments} name="category" />
+            <MultipleInput name='category' max={governments.length - 1} child={<ComboBox items={governments} />} />
           </FormItem>
           <FormItem label='Rarity'>
-            <Dropdown name='cardcategory' items={["All", "Common", "Uncommon", "Rare", "Ultra-Rare", "Epic", "Legendary"]} defindex={0} />
+            <MultipleInput name='cardcategory' max={6} child={<Dropdown items={["All", "Common", "Uncommon", "Rare", "Ultra-Rare", "Epic", "Legendary"]} defindex={0} />} />
           </FormItem>
           <FormItem label='Region'>
-            <Input name='region' />
+            <MultipleInput name='region' child={<SingleInput />} />
           </FormItem>
           <FormItem label='Ex-Nation? (s1 only)'>
             <div className='flex gap-2'>
@@ -120,30 +133,30 @@ export default function Home() {
             </div>
           </FormItem>
           <FormItem label='Flag'>
-            <ComboBox items={flags} name='flag' />
+            <MultipleInput name='flag' max={flags.length - 1} child={<ComboBox items={flags} />} />
           </FormItem>
           <FormItem label='Motto'>
-            <Input name='motto' />
+            <MultipleInput name='motto' child={<SingleInput />} />
           </FormItem>
           <FormItem label='Name'>
-            <Input name='name' />
+            <MultipleInput name='name' child={<SingleInput />} />
           </FormItem>
           <FormItem label='Type'>
-            <Input name='type' />
+            <MultipleInput name='type' child={<SingleInput />} />
           </FormItem>
           <div className='grid grid-cols-2 m-2 w-72 sm:w-96 gap-4 items-center justify-center'>
             <div className='flex items-center gap-4'>
             <Switch id="collection" onCheckedChange={() => setCollectionType(collectionType === 'Collection' ? 'Deck' : 'Collection')}  />
             <Label htmlFor="collection">{collectionType}</Label>
             </div>
-            <Input name='collection' />
+            <MultipleInput max={2} name={collectionType.toLowerCase()} child={<SingleInput />} />
           </div>
           <div className="flex flex-col gap-2 items-center mt-6">
               <Switch name="mode" id="mode" onCheckedChange={() => render === "Cards" ? setRender('Names') : setRender('Cards')} />
               <Label htmlFor="mode">{render}</Label>
           </div>
           <Button variant={"outline"}
-          data-umami-event="Search Query" className="mt-6 transition duration-500 bg-blue-700 hover:bg-blue-600" type='submit'>Search</Button>
+          data-umami-event="Search Query" className="mt-6 transition duration-500 bg-purple-700 hover:bg-blue-600" type='submit'>Search</Button>
         </form>
       </div>
       <div className='flex flex-col mt-16 gap-4'>
@@ -156,8 +169,8 @@ export default function Home() {
                 localStorage.setItem('queries', JSON.stringify(queries.filter((_, index) => index !== i)));
               }} />
               <Clipboard className='hover:cursor-pointer' onClick={() => navigator.clipboard.writeText(query)}/>
-              <a className='hover:text-blue-700 hover:cursor-pointer' data-umami-event="Viewed Previous Query" 
-              onClick={() => window.location.href = `/query?${query}`}>{query.length > 45 ? query.slice(0, 45) + '...' : query}
+              <a className='hover:text-purple-700 hover:cursor-pointer' data-umami-event="Viewed Previous Query" 
+              onClick={() => window.location.href = `/query${query}`}>{query.length > 45 ? query.slice(0, 45) + '...' : query}
               </a>
             </div>
           )
