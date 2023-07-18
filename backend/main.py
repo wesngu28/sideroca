@@ -114,13 +114,35 @@ async def index(
                     for value in values:
                         elements = value.split("|")
                         if len(values) == 1:
-                            or_badges.extend(elements)
+                            and_badges.extend(elements)
                             break
-                        and_badges.append(elements[0])
+                        or_badges.append(elements[0])
                         if len(elements) > 1:
-                            or_badges.append(elements[1])
-                    format_or_badges = [' '.join(word.capitalize() if word[0].isalpha() else word[0] + word[1].capitalize() + word[2:] if param == 'badges' else word.upper() for word in badge.split('_')) for badge in or_badges]
-                    format_and_badges = [' '.join(word.capitalize() if word[0].isalpha() else word[0] + word[1].capitalize() if param == 'badges' else word.upper() for word in badge.split('_')) for badge in and_badges]
+                            and_badges.append(elements[1])
+                    format_or_badges = []
+                    for badge in or_badges:
+                        formatted_words = []
+                        for word in badge.split('_'):
+                            if param == 'badges':
+                                if word[0].isalpha():
+                                    formatted_words.append(word.capitalize())
+                                else:
+                                    formatted_words.append(word[0] + word[1].capitalize() + word[2:])
+                            else:
+                                formatted_words.append(word.upper())
+                        format_or_badges.append(' '.join(formatted_words))
+                    format_and_badges = []
+                    for badge in and_badges:
+                        formatted_words = []
+                        for word in badge.split('_'):
+                            if param == 'badges':
+                                if word[0].isalpha():
+                                    formatted_words.append(word.capitalize())
+                                else:
+                                    formatted_words.append(word[0] + word[1].capitalize())
+                            else:
+                                formatted_words.append(word.upper())
+                        format_and_badges.append(' '.join(formatted_words))
                     or_badges_queries = [~(getattr(models.Card, param)[badge[1:]]) if badge.startswith('!') else getattr(models.Card, param)[badge] for badge in format_or_badges]
                     and_badges_queries = [~(getattr(models.Card, param)[badge[1:]]) if badge.startswith('!') else getattr(models.Card, param)[badge] for badge in format_and_badges]
 
