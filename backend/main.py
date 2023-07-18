@@ -77,7 +77,7 @@ async def index(
     request: Request,
     db: Session = Depends(get_db),
     cache: Union[Redis, None] = Depends(get_redis),
-    season: int | None = None,
+    season: int | str | None = None,
     name: str | None = None,
     type: str | None = None,
     motto: str | None = None,
@@ -164,16 +164,14 @@ async def index(
                 formatted_values = [~(getattr(models.Card, param) == value[1:]) if value is not None and value.startswith('!') else getattr(models.Card, param) == value if value is not None else True for value in values]
                 match_queries.append(or_(*formatted_values))
 
+        season = str(season)
         query_finales = db.query(models.Card).filter(
-                season is None or models.Card.season != str(season[1:]) if str(isinstance(season, str)) else models.Card.season == str(season),
+                season is None or models.Card.season != str(season[1:]) if season.startswith('!') else models.Card.season == str(season),
                 *match_queries if match_queries is not None else True,
                 *sans_queries if sans_queries is not None else True,
                 or_(*or_badges_queries) if or_badges_queries is not None else True,
                 *and_badges_queries if and_badges_queries is not None else True,
         )
-
-        if (season is not None or (cardcategory is not None and cardcategory != 'legendary')) and all(value is None for value in (name, type, motto, category, region, flag, badges, trophies)):
-            mode = "names"
         
         if (mode is not None and mode == "names"):
             query_finales = query_finales.with_entities(models.Card.name, models.Card.id, models.Card.season).all()
