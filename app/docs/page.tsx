@@ -90,8 +90,8 @@ export default function Docs() {
                         Variable Parameters
                     </h4>
                     <p className="leading-7 [&:not(:first-child)]:mt-2">
-                        Trophies and badges support variable matching. By default, separating values with commas performs an "and" match,
-                        while separating values with a vertical bar (|) performs an "or" match. This allows you to search for nations based on different trophy or badge combinations.
+                        Trophies and badges support variable matching. By default, separating values with commas performs an and match,
+                        while separating values with a vertical bar (|) performs an or match. This allows you to search for nations based on different trophy or badge combinations.
                     </p>
                     <pre className="mt-2">
                             trophies=happy-1,fat-5|bev-1
