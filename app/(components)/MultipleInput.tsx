@@ -6,13 +6,14 @@ interface Props {
   child: React.ReactNode;
   name: string;
   max?: number;
+  nullable?: boolean
 }
 
 interface InputData {
   include: boolean;
 }
 
-export function MultipleInput({ child, name, max }: Props) {
+export function MultipleInput({ child, name, max, nullable }: Props) {
   const [inputs, setInputs] = useState<InputData[]>([{ include: true}]);
 
   const addInput = () => {
@@ -34,7 +35,7 @@ export function MultipleInput({ child, name, max }: Props) {
         {inputs.map((input, index) => (
           <React.Fragment key={index}>
             <div className="flex items-center gap-4">
-              <div className="flex items-center justify-center flex-col">
+              {nullable == undefined ? <div className="flex items-center justify-center flex-col">
                 <button
                   onClick={(e) => {
                     e.preventDefault()
@@ -46,7 +47,7 @@ export function MultipleInput({ child, name, max }: Props) {
                 >
                   !
                 </button>
-              </div>
+              </div> : <div className="h-6 w-6 "></div>}
               {React.cloneElement(child as React.ReactElement<any>, {
                 include: input.include,
                 name: index > 0 ? `${name}${index}` : name,

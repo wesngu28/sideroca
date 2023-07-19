@@ -70,7 +70,7 @@ export function ComboBox({ items, name, include }: Props) {
                     </Command>
                 </PopoverContent>
             </Popover>
-            {name === "trophies" && value && !value.includes('!') && <>
+            {name?.includes("trophies") && value && value !== "Sans" && !value.includes('!') && include && <>
                 <RadioGroup className="flex" defaultValue="" name={`${include ? value : `!${value}`}%`}>
                     <div className="flex items-center space-x-2">
                         <RadioGroupItem value="1t" id="1st" />

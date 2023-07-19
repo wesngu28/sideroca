@@ -1,8 +1,7 @@
 import { Button } from "@/components/ui/button";
-import { AlertTriangle, Home } from "lucide-react";
+import { Home } from "lucide-react";
 import Link from "next/link";
-import { flags, trophiesDict } from "../(helpers)/categories";
-import { badges, governments } from "../categories";
+import { badges, governments, flags, trophiesDict } from "../(helpers)/categories";
 
 export default function Docs() {
     return (
@@ -39,13 +38,13 @@ export default function Docs() {
                         <code>
                             /cards?cardcategory=rare&category=authoritarian_democracy,civil_rights_lovefest
                         </code>
-                        <p>Gets all rare cards that are authoritiarian democracies and civil rights lovefests.</p>
+                        <p>Gets all rare cards that are authoritiarian democracies or civil rights lovefests.</p>
                     </div>
                     <div className="my-2">
                         <code>
-                            /cards?trophies=civil_rights&badge=admin
+                            /cards?trophies=civil_rights-1&badge=admin
                         </code>
-                        <p>Gets all nations with a civil rights badge that are administrators.</p>
+                        <p>Gets all nations with a 1% civil rights badge that are administrators.</p>
                     </div>
                     <div className="mb-12">
                         <code>
@@ -68,34 +67,31 @@ export default function Docs() {
                         Excluding Parameters
                     </h4>
                     <p className="leading-7 [&:not(:first-child)]:mt-2">
-                        All of the parameters can be excluded from the query by simply not having them. This does not mean you are querying nations 
-                        that lack mottos or  field that you are excluding. To explicitly do this is to preface them with an exclamation mark (category=!anarchy).
-                        The ones that do support full exclusion searching are trophies and badges, by passing sans in 
-                        <span className="font-bold"> (IE: trophies=sans)</span>. This will get nations with no trophies.
+                        You can exclude certain parameters from the query by simply not including them. However, this doesn't mean you are searching for nations without those fields.
+                        To explicitly exclude them, you can use an exclamation mark before the parameter (e.g., category=!anarchy).
+                        Trophies and badges are special as they support full exclusion searching. You can use the keyword "sans" to find nations without trophies (e.g., trophies=sans).
                     </p>
                     <h4 className="scroll-m-20 text-xl font-semibold tracking-tight mt-6">
                         Partial and Exact Matching
                     </h4>
                     <p className="leading-7 [&:not(:first-child)]:mt-2">
-                        Some parameters only allow both partial and exact matching. The parameters that match in this way are
-                        <span className="font-bold"> name</span>, nation manual 
-                        <span className="font-bold"> type</span>, <span className="font-bold">region</span>, and
-                        <span className="font-bold"> motto</span>. By default they match partially. To match exactly, pass name==Giovanni (matches Giovanni exactly),
-                         or name=!=Giovanni (ignores the nation of Giovanni).
+                        For some parameters, you can perform both partial and exact matching. These parameters include name, nation manual, type, region, and motto.
+                        By default, they perform partial matching. To match exactly, you can use double equal signs (e.g., name==Giovanni matches "Giovanni" exactly).
+                        You can also use the "!=" operator to ignore a specific value (e.g., name=!=Giovanni ignores the nation named "Giovanni").
                     </p>
                     <h4 className="scroll-m-20 text-xl font-semibold tracking-tight mt-6">
                         Exact Matching
                     </h4>
                     <p className="leading-7 [&:not(:first-child)]:mt-2">
-                        Some parameters only allow exact matching. The parameters that match exactly are <span className="font-bold"> flag</span>,
-                        <span className="font-bold"> cardcategory</span> (rarity), and WA<span className="font-bold"> category</span>.
+                        Certain parameters require exact matching. These parameters include flag, cardcategory (rarity), and WA category.
+                        When using these parameters, the values must match exactly to find the desired nations.
                     </p>
                     <h4 className="scroll-m-20 text-xl font-semibold tracking-tight mt-6">
                         Variable Parameters
                     </h4>
                     <p className="leading-7 [&:not(:first-child)]:mt-2">
-                        Trophies and badges support variable matching (this has sketchy implementation). By default, separating values with for trophies and badges with commas
-                        will have it perform an and match, and separating values with | will perform an or.
+                        Trophies and badges support variable matching. By default, separating values with commas performs an "and" match,
+                        while separating values with a vertical bar (|) performs an "or" match. This allows you to search for nations based on different trophy or badge combinations.
                     </p>
                     <pre className="mt-2">
                             trophies=happy-1,fat-5|bev-1
@@ -108,8 +104,16 @@ export default function Docs() {
                         All parameters can be nulled
                     </p>
                     <ul className="my-3 ml-6 list-disc [&>li]:mt-4">
-                        <li className="flex gap-2">Deck - <AlertTriangle /> Testing, takes ID</li>
-                        <li className="flex gap-2">Collection - <AlertTriangle /> Testing, takes ID</li>
+                        <li>Deck - takes a nation name</li>
+                        <p className="ml-6 mb-2">
+                        When you pass the deck parameter in the cards route, the API will match the returned cards against the specified decks, 
+                        indicating whether each card is included within them. Mutually exclusive with deck.
+                        </p>
+                        <li>Collection - takes an ID</li>
+                        <p className="ml-6 mb-2">
+                        When you pass the collection parameter in the cards route, the API will match the returned cards against the specified collections, 
+                        indicating whether each card is included within them. Mutually exclusive with collection.
+                        </p>
                         <li>Mode - Indicates JSON return type</li>
                         <li>Season - Indicates Card Season</li>
                         <p className="ml-6 my-2">Format: season=1, season=2, season=3</p>
@@ -161,19 +165,19 @@ export default function Docs() {
                         <li>Type - The manually changeable type category</li>
                         <p className="ml-6 my-2">Format: type=kingdom</p>
                     </ul>
-                    <h3 id="#collection" className="scroll-m-20 text-2xl font-semibold tracking-tight">
+                    <h3 id="collection" className="scroll-m-20 text-2xl font-semibold tracking-tight">
                         /collection
                     </h3>
                     <p className="leading-7 [&:not(:first-child)]:mt-6">
                         A secondary route, the purpose of this route is to take one or multiple collections, and compare it against
-                        the cards in your deck.
+                        the cards in your deck. Essentially this returns all cards in your deck that are not in active collections.
                     </p>
                     <h4 className="scroll-m-20 text-xl font-semibold tracking-tight mt-6">
                         Exposed Parameters
                     </h4>
                     <ul className="my-3 ml-6 list-disc [&>li]:mt-4">
-                        <li>Deck - Takes one parameter, a nation name</li>
-                        <li>Collection - Takes a collection parameter, with additional ones possible separated by commas</li>
+                        <li>Deck - Takes a deck name, provide additional ones with commas.</li>
+                        <li>Collection - Takes a collection parameter, provide additional ones with commas.</li>
                     </ul>
                     <h4 className="scroll-m-20 text-xl font-semibold tracking-tight mt-6 text-center">
                         Sample Queries

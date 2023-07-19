@@ -202,7 +202,7 @@ export function Query() {
                 }
                 if (collectionCards.length > 0 && deckCards.length > 0) {
                     const cardsNotInCollection = deckCards.filter((card) => {
-                        return !collectionCards.some((collectionCard) => collectionCard.CARDID === card.CARDID);
+                        return !collectionCards.some((collectionCard) => collectionCard.CARDID === card.CARDID && collectionCard.SEASON === card.SEASON);
                     });
                     const getCards = await fetch('/api/collection', {
                         signal: abortController.signal,
