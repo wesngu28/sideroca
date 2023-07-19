@@ -59,13 +59,6 @@ export default function Home() {
     const uniqueEntries: [string, FormDataEntryValue][] = [];
 
     for (const [key, value] of Array.from(formData.entries())) {
-      if (key === 'manual') {
-        queries.unshift(value.toString())
-        localStorage.setItem('queries', JSON.stringify(queries))
-        setQueries(queries)
-        router.push(`/query?${formData.get('manual')?.toString()}`)
-        return
-      }
       const baseKey = key.replace(/\d+$/, '').replace('!', '');
       if (!uniqueKeys.has(baseKey)) {
         uniqueKeys.add(baseKey);
@@ -76,6 +69,13 @@ export default function Home() {
       const keywords = ['season', 'region', 'badges', 'cardcategory', 'category', 'flag', 'motto', 'type', 'name'];
       for (const [key, value] of uniqueEntries) {
         if (value) {
+          if (key === 'manual') {
+            queries.unshift(value.toString())
+            localStorage.setItem('queries', JSON.stringify(queries))
+            setQueries(queries)
+            router.push(`/query?${formData.get('manual')?.toString()}`)
+            return
+          }
           const iterableKeys = [...Array.from(formData.keys())]
           if (keywords.some(keyword => key.includes(keyword))) {
             if (key.includes('category') && key !== 'cardcategory') {
