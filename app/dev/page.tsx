@@ -6,7 +6,7 @@ export default function Dev() {
     return (
         <main className="flex min-h-screen flex-col items-center p-12 max-w-7xl">
             <div className='mt-2 mb-10 text-center'>
-                <h1 className="text-7xl my-2 tracking-tight">Card <span className='text-blue-700'>Queries</span></h1>
+                <h1 className="text-7xl my-2 tracking-tight">Card <span className='text-purple-700'>Queries</span></h1>
                 <Link href="/"><Button className='rounded-md text-sm font-medium px-4 py-2 my-2'><Home /></Button></Link>
             </div>
             <h2 className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0">

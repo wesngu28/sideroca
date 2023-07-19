@@ -100,11 +100,15 @@ export default function Home() {
 
   return (
     <main className="flex min-h-screen flex-col items-center p-12">
-      <div className='mt-2 mb-10 text-center'>
-        <h1 className="text-7xl my-2 tracking-tight">Card <span className='text-purple-700'>Queries</span></h1>
+      <div className='mt-2 mb-2 text-center'>
+        <h1 className="text-7xl my-2 mb-10 tracking-tight">Card <span className='text-purple-700'>Queries</span></h1>
         <Link className='h-full w-full' href="/docs"><Button className='rounded-md text-sm font-medium px-4 py-2 my-2'>API Docs</Button></Link>
       </div>
       <div className="relative flex flex-col">
+        <div className='flex justify-center gap-4 mb-5'>
+          <Button className='text-sm px-2 py-1'>Card Query</Button>
+          <Button>Not in Collection</Button>
+        </div>
         <form className='flex flex-col items-center' onSubmit={(e) => makeRequest(e)} name='card'>
           <p className='mb-6'>Enter your query manually, or fill out the form.</p>
           <Input className='mb-6 w-full' name="manual" />
@@ -156,7 +160,7 @@ export default function Home() {
               <Label htmlFor="mode">{render}</Label>
           </div>
           <Button variant={"outline"}
-          data-umami-event="Search Query" className="mt-6 transition duration-500 bg-purple-700 hover:bg-blue-600" type='submit'>Search</Button>
+          data-umami-event="Search Query" className="mt-6 transition duration-500 bg-purple-600 hover:bg-purple-500" type='submit'>Search</Button>
         </form>
       </div>
       <div className='flex flex-col mt-16 gap-4'>
