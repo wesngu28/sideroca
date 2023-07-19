@@ -291,7 +291,7 @@ export function Query() {
                         <div className='flex flex-wrap justify-center'>
                             {!correspondingJson[0].motto ?
                                 <div className='flex flex-col dark:text-white'>
-                                    {currentItems.map((card, i) => <p key={i}>{card.name}</p>)}
+                                    {currentItems.map((card, i) => <p className={`${card.inCollection == false ? 'text-red-500' : 'text-blue-500'}`} key={i}>{card.name}</p>)}
                                 </div>
                                 :
                                 currentItems.map((card, i) =>

@@ -22,6 +22,7 @@ export default function Home() {
   const [collectionType, setCollectionType] = useState("Collection")
   const [render, setRender] = useState("cards")
   const [route, setRoute] = useState(true)
+  const [manualInput, setManualInput] = useState("")
 
   const router = useRouter()
 
@@ -44,6 +45,10 @@ export default function Home() {
     }
   }
 
+  useEffect(() => {
+    setManualInput("");
+  }, [route]);
+
   async function makeRequest(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
     const form = e.target as HTMLFormElement;
@@ -54,6 +59,13 @@ export default function Home() {
     const uniqueEntries: [string, FormDataEntryValue][] = [];
 
     for (const [key, value] of Array.from(formData.entries())) {
+      if (key === 'manual') {
+        queries.unshift(value.toString())
+        localStorage.setItem('queries', JSON.stringify(queries))
+        setQueries(queries)
+        router.push(`/query?${formData.get('manual')?.toString()}`)
+        return
+      }
       const baseKey = key.replace(/\d+$/, '').replace('!', '');
       if (!uniqueKeys.has(baseKey)) {
         uniqueKeys.add(baseKey);
@@ -64,13 +76,6 @@ export default function Home() {
       const keywords = ['season', 'region', 'badges', 'cardcategory', 'category', 'flag', 'motto', 'type', 'name'];
       for (const [key, value] of uniqueEntries) {
         if (value) {
-          if (key === 'manual') {
-            queries.unshift(value.toString())
-            localStorage.setItem('queries', JSON.stringify(queries))
-            setQueries(queries)
-            router.push(`/query?${formData.get('manual')?.toString()}`)
-            return
-          }
           const iterableKeys = [...Array.from(formData.keys())]
           if (keywords.some(keyword => key.includes(keyword))) {
             if (key.includes('category') && key !== 'cardcategory') {
@@ -86,7 +91,6 @@ export default function Home() {
               for (const trophyKey of trophyKeys) {
                 if (trophyKey.includes('trophies') && formData.get(trophyKey)) trophies.push(trophiesDict[formData.get(trophyKey)! as string].replaceAll(' ', '_'))
                 if (trophyKey.includes('%') || trophyKey === '1t') trophies.push(`-${(formData.get(trophyKey) as string)}`)
-                console.log(trophies)
               }
               query.push(trophies.join(',').replace(',', '').replaceAll(',-', '-'))
             }
@@ -108,8 +112,7 @@ export default function Home() {
     localStorage.setItem('queries', JSON.stringify(queries));
     setQueries(Array.from(queries))
     if (formData.get('mode') === 'on') baseString += "&mode=name"
-    console.log(baseString)
-    // router.push(`/query${baseString}`)
+    router.push(`/query${baseString}`)
   }
 
   return (
@@ -125,8 +128,9 @@ export default function Home() {
         </div>
         {route === true ?
           <form className='flex flex-col items-center' onSubmit={(e) => makeRequest(e)} name='card'>
-            <p className='mb-6'>Enter your query manually, or fill out the form.</p>
-            <Input className='mb-6 w-full' name="manual" />
+            <p>Enter your query manually, or fill out the form.</p>
+            <p className='mb-6 text-xs'>(IE: name=testlandia)</p>
+            <Input className='mb-6 w-full' placeholder={"/card?"} name="manual" value={manualInput} onChange={(e) => setManualInput(e.target.value)} />
             <FormItem label='Filter Season'>
               <MultipleInput name='season' max={2} child={<Dropdown items={["All", "Season 1", "Season 2", "Season 3"]} defindex={0} />} />
             </FormItem>
@@ -179,7 +183,9 @@ export default function Home() {
           </form>
           :
           <form className='flex flex-col items-center' onSubmit={(e) => makeRequest(e)} name='card'>
-            <p className='mb-6'>Enter your query manually, or fill out the form.</p>
+            <p>Enter your query manually, or fill out the form.</p>
+            <p className='mb-6 text-xs'>(IE: collection=1,deck=testlandia)</p>
+            <Input className='mb-6 w-full' placeholder={"/collection?"} name="manual" value={manualInput} onChange={(e) => setManualInput(e.target.value)} />
             <FormItem label='Collection'>
               <MultipleInput name='collection' nullable={false} child={<SingleInput />} />
             </FormItem>

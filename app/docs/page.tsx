@@ -67,17 +67,17 @@ export default function Docs() {
                         Excluding Parameters
                     </h4>
                     <p className="leading-7 [&:not(:first-child)]:mt-2">
-                        You can exclude certain parameters from the query by simply not including them. However, this doesn't mean you are searching for nations without those fields.
+                        You can exclude certain parameters from the query by simply not including them. However, this does not mean you are searching for nations without those fields.
                         To explicitly exclude them, you can use an exclamation mark before the parameter (e.g., category=!anarchy).
-                        Trophies and badges are special as they support full exclusion searching. You can use the keyword "sans" to find nations without trophies (e.g., trophies=sans).
+                        Trophies and badges are special as they support full exclusion searching. You can use the keyword sans to find nations without trophies (e.g., trophies=sans).
                     </p>
                     <h4 className="scroll-m-20 text-xl font-semibold tracking-tight mt-6">
                         Partial and Exact Matching
                     </h4>
                     <p className="leading-7 [&:not(:first-child)]:mt-2">
                         For some parameters, you can perform both partial and exact matching. These parameters include name, nation manual, type, region, and motto.
-                        By default, they perform partial matching. To match exactly, you can use double equal signs (e.g., name==Giovanni matches "Giovanni" exactly).
-                        You can also use the "!=" operator to ignore a specific value (e.g., name=!=Giovanni ignores the nation named "Giovanni").
+                        By default, they perform partial matching. To match exactly, you can use double equal signs (e.g., name==Giovanni matches Giovanni exactly).
+                        You can also use the != operator to ignore a specific value (e.g., name=!=Giovanni ignores the nation named Giovanni).
                     </p>
                     <h4 className="scroll-m-20 text-xl font-semibold tracking-tight mt-6">
                         Exact Matching
