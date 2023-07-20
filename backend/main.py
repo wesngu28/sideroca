@@ -16,7 +16,8 @@ from cache import pool
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
-from dotenv import load_dotenv 
+from dotenv import load_dotenv
+from fastapi.middleware.cors import CORSMiddleware
 
 load_dotenv()
 models.Base.metadata.create_all(bind=engine)
@@ -38,10 +39,15 @@ def get_limiter_key(request: Request):
     limiter_key = re.sub(r":{1,}", ":", re.sub(r"/{1,}", ":", limiter_prefix + current_key))
     return limiter_key
 
-# limiter = Limiter(key_func=get_limiter_key, storage_uri=f"redis://localhost:6379/1")
+limiter = Limiter(key_func=get_limiter_key, storage_uri=os.environ['REDISURL'])
 app = FastAPI()
-# app.state.limiter = limiter
-# app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+)
 
 def get_db():
     db = SessionLocal()
@@ -50,8 +56,8 @@ def get_db():
     finally:
         db.close()
 
-# def get_redis():
-#   return redis.Redis(connection_pool=pool)
+def get_redis():
+  return redis.Redis(connection_pool=pool)
 
 class CardSchema(BaseModel):
     id: int
@@ -72,10 +78,11 @@ def redirectHome():
     return RedirectResponse("https://cardqueries.vercel.app")
 
 @app.get("/cards")
-# @limiter.limit("30/minute")
+@limiter.limit("30/minute")
 async def index(
     request: Request,
     db: Session = Depends(get_db),
+    cache: Union[Redis, None] = Depends(get_redis),
     season: int | str | None = None,
     type: str | None = None,
     name: str | None = None,
@@ -94,8 +101,8 @@ async def index(
         cardcategory = rarity
     if all(value is None for value in request.query_params.keys()):
         return {"cards": []}
-    cached_response = "ok"
-    if cached_response == "okk":
+    cached_response = cache.get(str(request.query_params))
+    if cached_response:
         return json.loads(cached_response)
     else:
         sans_queries = []
@@ -186,15 +193,20 @@ async def index(
             card_dicts = {"cards": [{key: getattr(card, key) for key in card.__table__.columns.keys()} for card in query_finales]}
             if len(card_dicts["cards"]) > 12000:
                 filtered_card_dicts = {"cards": [{"name": card['name'], "id": card['id'], "season": card['season']} for card in card_dicts['cards']]}
+                cache.set(str(request.query_params), json.dumps(filtered_card_dicts))
+                cache.expire(str(request.query_params), 3600)
                 return filtered_card_dicts
             else:
+                cache.set(str(request.query_params), json.dumps(card_dicts))
+                cache.expire(str(request.query_params), 3600)
                 return card_dicts
         
 @app.post("/collection")
-async def index(request: Request, db: Session = Depends(get_db)):
+@limiter.limit("30/minute")
+async def index(request: Request, db: Session = Depends(get_db), cache: Union[Redis, None] = Depends(get_redis),):
     cards_in_collection = await request.json()
-    cached_response = "ok"
-    if cached_response == "okk":
+    cached_response = cache.get(str(request.query_params))
+    if cached_response:
         return json.loads(cached_response)
     else:
         query_finales = []
@@ -206,4 +218,6 @@ async def index(request: Request, db: Session = Depends(get_db)):
             )
             query_finales.extend(query.all())
         card_dicts = {"cards": [{key: getattr(card, key) for key in card.__table__.columns.keys()} for card in query_finales] }
+        cache.set(str(request.query_params), json.dumps(card_dicts))
+        cache.expire(str(request.query_params), 3600)
         return card_dicts
