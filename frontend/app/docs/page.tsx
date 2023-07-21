@@ -19,7 +19,7 @@ export default function Docs() {
                 <p className="leading-7 mt-4">
                     The API primarily serves as a card query facilitator. It enables users to retrieve card-related information through 
                     various queries. However, specific features related to collections and decks are handled exclusively on the frontend. 
-                    These functionalities rely on making API calls to NationStates, and to mitigate potential rate-limiting issues, I've 
+                    These functionalities rely on making API calls to NationStates, and to mitigate potential rate-limiting issues, I have 
                     chosen to keep these operations on the client-side.
                 </p>
                 </div>
@@ -33,9 +33,9 @@ export default function Docs() {
                     a menu of available fields that you can include in your query.
                 </p>
                 <p className="leading-7">
-                    At the top of the interface, you will find a button that allows you to switch between the "/cards" and "/collection" routes. 
+                    At the top of the interface, you will find a button that allows you to switch between the /cards and /collection routes. 
                     When you switch between the routes, the interface will adapt to display the relevant options and functionalities specific to that route.
-                    On the "/cards" route, you have the option to select between "Collection" and "Deck", which is a mutually exclusive choice.
+                    On the /cards route, you have the option to select between Collection and Deck, which is a mutually exclusive choice.
                 </p>
                 <p className="leading-7">
                     For users who are comfortable with manual query building, you have the option to construct your own custom query. At the top of the interface, 
