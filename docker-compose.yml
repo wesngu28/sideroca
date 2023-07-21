@@ -44,7 +44,7 @@ services:
         DATABASE_URL: ${DATABASE_URL}
         REDISHOST: ${REDISHOST}
         REDISPORT: ${REDISPORT}
-        REDIS_URL: ${REDISURL}
+        REDIS_URL: ${REDIS_URL}
       depends_on:
         - db
         - cache

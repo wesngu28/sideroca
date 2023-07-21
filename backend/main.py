@@ -150,8 +150,12 @@ async def index(
                             else:
                                 formatted_words.append(word.upper())
                         format_and_badges.append(' '.join(formatted_words))
-                    or_badges_queries = [~(getattr(models.Card, param)[badge[1:]]) if badge.startswith('!') else getattr(models.Card, param)[badge] for badge in format_or_badges]
-                    and_badges_queries = [~(getattr(models.Card, param)[badge[1:]]) if badge.startswith('!') else getattr(models.Card, param)[badge] for badge in format_and_badges]
+                    if 'sqlite' in os.environ['DATABASE_URL']:
+                        or_badges_queries = [~(getattr(models.Card, param)[badge[1:]]) if badge.startswith('!') else getattr(models.Card, param)[badge] for badge in format_or_badges]
+                        and_badges_queries = [~(getattr(models.Card, param)[badge[1:]]) if badge.startswith('!') else getattr(models.Card, param)[badge] for badge in format_and_badges]
+                    else:
+                        or_badges_queries = [~(getattr(models.Card, param).op("?")(badges[1:])) if badge.startswith('!') else getattr(models.Card, param).op("?")(badge) for badge in format_or_badges]
+                        and_badges_queries = [~(getattr(models.Card, param).op("?")(badges[1:])) if badge.startswith('!') else getattr(models.Card, param).op("?")(badge) for badge in format_and_badges]
 
             if param in ('name', 'type', 'region', 'flag', 'motto'):
                 value = request.query_params[param]
