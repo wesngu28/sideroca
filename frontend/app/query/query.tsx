@@ -146,7 +146,6 @@ export function Query() {
         const abortController = new AbortController();
         async function fetcher() {
             try {
-                let baseString = window.location.href.replace(`${process.env.NEXT_PUBLIC_SITE}/query`, '')
                 let cardList: Card[] = []
                 let collectionCards: Array<{CARDID: string, SEASON: number, CATEGORY: string}> = []
                 let deckCards: Array<{CARDID: string, SEASON: number, CATEGORY: string}> = []
@@ -203,18 +202,16 @@ export function Query() {
                 if (collectionCards.length > 0 && deckCards.length > 0) {
                     const cardsNotInCollection = deckCards.filter((card) => {
                         return !collectionCards.some((collectionCard) => collectionCard.CARDID === card.CARDID && collectionCard.SEASON === card.SEASON);
-                    });
-                    const getCards = await fetch('/api/collection', {
-                        signal: abortController.signal,
-                        body: JSON.stringify({ "url": `${process.env.NEXT_PUBLIC_API}/collection${baseString}`, "cards": cardsNotInCollection }),
+                    });    
+                    const getCards = await fetch(`${process.env.NEXT_PUBLIC_API}/collection?${lastQuery}`, {
+                        body: JSON.stringify(cardsNotInCollection),
                         method: "POST"
                     })
-                    cardList = (await getCards.json()).cards
+                    const cardsJson = await getCards.json()
+                    cardList = cardsJson.cards
                 } else {
-                    const getCards = await fetch('/api', {
+                    const getCards = await fetch(`${process.env.NEXT_PUBLIC_API}/cards?${lastQuery}`, {
                         signal: abortController.signal,
-                        body: `${process.env.NEXT_PUBLIC_API}/cards${baseString}`,
-                        method: "POST"
                     })
                     let cardsJson = await getCards.json()
                     cardList = await Promise.all((cardsJson.cards as Card[]).map(async (nation) => {
