@@ -39,7 +39,7 @@ def get_limiter_key(request: Request):
     limiter_key = re.sub(r":{1,}", ":", re.sub(r"/{1,}", ":", limiter_prefix + current_key))
     return limiter_key
 
-limiter = Limiter(key_func=get_limiter_key, storage_uri=os.environ['REDISURL'])
+limiter = Limiter(key_func=get_limiter_key, storage_uri=os.environ['REDIS_URL'])
 app = FastAPI()
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)

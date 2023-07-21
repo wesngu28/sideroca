@@ -20,7 +20,7 @@ export default function Home() {
 
   const [queries, setQueries] = useState<string[]>([])
   const [collectionType, setCollectionType] = useState("Collection")
-  const [render, setRender] = useState("cards")
+  const [render, setRender] = useState("Cards")
   const [route, setRoute] = useState(true)
   const [manualInput, setManualInput] = useState("")
 
@@ -167,7 +167,7 @@ export default function Home() {
             <FormItem label='Type'>
               <MultipleInput name='type' child={<SingleInput />} />
             </FormItem>
-            <div className='grid grid-cols-2 m-2 w-72 sm:w-96 gap-4 items-center justify-center'>
+            <div className='flex flex-col sm:grid sm:grid-cols-2 m-2 w-72 sm:w-96 gap-4 items-center justify-center'>
               <div className='flex items-center gap-4'>
                 <Switch id="collection" onCheckedChange={() => setCollectionType(collectionType === 'Collection' ? 'Deck' : 'Collection')} />
                 <Label htmlFor="collection">{collectionType}</Label>
@@ -179,7 +179,7 @@ export default function Home() {
               <Label htmlFor="mode">{render}</Label>
             </div>
             <Button variant={"outline"}
-              data-umami-event="Search Query" className="mt-6 transition duration-500 bg-purple-600 hover:bg-purple-500" type='submit'>Search</Button>
+              data-umami-event="Search Query" className="mt-6 transition duration-500 bg-purple-700 hover:bg-purple-500 border-none" type='submit'>Search</Button>
           </form>
           :
           <form className='flex flex-col items-center' onSubmit={(e) => makeRequest(e)} name='card'>
@@ -193,7 +193,7 @@ export default function Home() {
               <MultipleInput name='deck' nullable={false} max={1} child={<SingleInput />} />
             </FormItem>
             <Button variant={"outline"}
-              data-umami-event="Collection Query" className="mt-6 transition duration-500 bg-purple-600 hover:bg-purple-500" type='submit'>Search</Button>
+              data-umami-event="Collection Query" className="mt-6 transition duration-500 bg-purple-700 hover:bg-purple-500 border-none" type='submit'>Search</Button>
           </form>
         }
       </div>

@@ -156,7 +156,7 @@ export function Query() {
                     for (let collection of collectionParam) {
                         const cardsReq = await fetch(`https://www.nationstates.net/cgi-bin/api.cgi?q=cards+${`collection;collectionid=${collection}`}`, {
                             headers: {
-                                'User-Agent': "Kractero card queries"
+                                'User-Agent': "Kractero Card Queries but the person running this is probably not Kractero"
                             }
                         })
                         setQueryTracker((prevQueryTracker) => updateQueryTracker(prevQueryTracker));
@@ -181,7 +181,7 @@ export function Query() {
                         const cardsReq = await fetch(`https://www.nationstates.net/cgi-bin/api.cgi?q=cards+${`deck;nationname=${deck}`}`, {
                             signal: abortController.signal,
                             headers: {
-                                'User-Agent': "Kractero card queries"
+                                'User-Agent': "Kractero Card Queries but the person running this is probably not Kractero"
                             }
                         })
                         setQueryTracker((prevQueryTracker) => updateQueryTracker(prevQueryTracker));
