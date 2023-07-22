@@ -16,23 +16,11 @@ export default function Dev() {
                 Stack
             </h2>
             <div className="flex flex-wrap justify-center">
-                <S1S2Card card={{
-                badges: {}, description: "", trophies: {},
-                cardcategory: "uncommon",
-                category: "JS Superset",
-                flag: "./TypeScript.png",
-                id: 1,
-                motto: "TypeScript is JavaScript with syntax for types.",
-                name: "TypeScript",
-                region: "TypeScript",
-                season: 2,
-                type: "Programming Language"
-            }} opt="TypeScript is a strongly typed programming language that builds on JavaScript, giving you better tooling at any scale." url="https://www.typescriptlang.org/" />
             <S1S2Card card={{
                 badges: {}, description: "", trophies: {},
-                cardcategory: "rare",
+                cardcategory: "uncommon",
                 category: "Frontend Framework",
-                flag: "./nextjs-icon.svg",
+                flag: "./NextJS.png",
                 id: 2,
                 motto: "The React Framework for the Web",
                 name: "Next.js",
@@ -42,7 +30,7 @@ export default function Dev() {
             }} opt="Used by some of the world's largest companies, Next.js enables you to create full-stack Web applications by extending the latest React features, and integrating powerful Rust-based JavaScript tooling for the fastest builds." url="https://nextjs.org/" />
             <S1S2Card card={{
                 badges: {}, description: "", trophies: {},
-                cardcategory: "ultra-rare",
+                cardcategory: "rare",
                 category: "CSS Framework",
                 flag: "./Tailwind.png",
                 id: 3,
@@ -52,6 +40,18 @@ export default function Dev() {
                 season: 2,
                 type: "CSS Utility"
             }} opt="A utility-first CSS framework packed with classes like flex, pt-4, text-center and rotate-90 that can be composed to build any design, directly in your markup." url="https://tailwindcss.com/" />
+            <S1S2Card card={{
+                badges: {}, description: "", trophies: {},
+                cardcategory: "legendary",
+                category: "CSS Components",
+                flag: "./Shadcn.png",
+                id: 1,
+                motto: "Build your component library.",
+                name: "shadcn/ui",
+                region: "shadcn",
+                season: 2,
+                type: "CSS Components"
+            }} opt="Beautifully designed components that you can copy and paste into your apps. Accessible. Customizable. Open Source." url="https://ui.shadcn.com/" />
             </div>
             <div className="flex flex-wrap justify-center">
                 <S1S2Card card={{
