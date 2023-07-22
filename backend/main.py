@@ -75,7 +75,7 @@ class CardSchema(BaseModel):
 
 @app.get("/")
 def redirectHome():
-    return RedirectResponse("https://cardqueries.vercel.app")
+    return RedirectResponse("https://sideroca.com/docs")
 
 @app.get("/cards")
 @limiter.limit("30/minute")

@@ -3,16 +3,16 @@ import { banners } from "../(helpers)/categories";
 import { Badges } from "./Badges";
 import { S2S3Description } from "./S2S3Description";
 
-export function S3Card({ card }: { card: Card }) {
+export function S3Card({ card, opt, url }: { card: Card, opt?: string, url?: string }) {
     return (
-        <a href={`https://www.nationstates.net/page=deck/card=${card.id}/season=${card.season}`} target="_blank" rel="noopener noreferrer">
+        <a href={url ? url : `https://www.nationstates.net/page=deck/card=${card.id}/season=${card.season}`} target="_blank" rel="noopener noreferrer">
             <div className={`deckcard-container ${card.inCollection !== undefined ? card.inCollection ? 'border-blue-400 border-2 border-solid' : 'border-red-600 border-2 border-solid' : ""}`}>
                 <div className="deckcard deckcard-season-3" data-cardid={card.id} data-season="3">
                     <figure className={`front deckcard-category-${card.cardcategory}`}>
                         <div className="s3-content">
                             <div className="s3-upper">
                                 <div className="s3-flagbox">
-                                    <div className="s3-flag"><div className="s3-flag-image" style={{ backgroundImage: `url(https://www.nationstates.net/images/cards/s3/${card.flag})` }}></div></div>
+                                    <div className="s3-flag"><div className="s3-flag-image" style={{ backgroundImage: `${card.flag.includes('./') ? `url(${card.flag}` : `url(https://www.nationstates.net/images/cards/s3/${card.flag})`}` }}></div></div>
                                 </div>
                                 <div className="s3-topline">
                                     <div className="s3-topbox">
@@ -27,6 +27,7 @@ export function S3Card({ card }: { card: Card }) {
                                 </div>
                             </div>
                             <div className="s3-mid deckcard-badges">
+                                {opt && <p className="text-[0.5rem] p-1 text-black shadow-md">{opt}</p>}
                                 <div className="role-badges">
                                     {Object.keys(card.badges).map(badge => {
                                         if (banners[badge]) {
@@ -46,7 +47,7 @@ export function S3Card({ card }: { card: Card }) {
                             </div>
                             <div className="s3-lower">
                                 <div className="deckcard-lower-collection deckcard-govt-collection">
-                                    <S2S3Description description={card.description} />
+                                    {card.description && <S2S3Description description={card.description} />}
                                 </div>
                                 <div className="deckcard-lower-collection">
                                     <div className="deckcard-category"></div>

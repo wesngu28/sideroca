@@ -1,2 +1,2 @@
-frontend/components/ui/* linguist-generated
-frontend/lib/utils.ts linguist-generated
+frontend/components/ui/* linguist-vendored
+frontend/lib/utils.ts linguist-vendored

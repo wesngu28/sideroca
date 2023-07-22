@@ -15,207 +15,119 @@ export default function Dev() {
             <h2 className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0">
                 Stack
             </h2>
-            <div className="flex">
+            <div className="flex flex-wrap justify-center">
                 <S1S2Card card={{
-                badges: {},
+                badges: {}, description: "", trophies: {},
                 cardcategory: "uncommon",
                 category: "JS Superset",
-                description: "",
                 flag: "./TypeScript.png",
-                id: 101030101,
+                id: 1,
                 motto: "TypeScript is JavaScript with syntax for types.",
                 name: "TypeScript",
                 region: "TypeScript",
                 season: 2,
-                trophies: {},
-                type: "The Programming Language of"
-            }}/>
+                type: "Programming Language"
+            }} opt="TypeScript is a strongly typed programming language that builds on JavaScript, giving you better tooling at any scale." url="https://www.typescriptlang.org/" />
             <S1S2Card card={{
-                badges: {},
+                badges: {}, description: "", trophies: {},
                 cardcategory: "rare",
                 category: "Frontend Framework",
-                description: "",
                 flag: "./nextjs-icon.svg",
-                id: 101010101,
+                id: 2,
                 motto: "The React Framework for the Web",
                 name: "Next.js",
                 region: "Vercel",
                 season: 2,
-                trophies: {},
-                type: "The React Framework of"
-            }}/>
+                type: "React Framework"
+            }} opt="Used by some of the world's largest companies, Next.js enables you to create full-stack Web applications by extending the latest React features, and integrating powerful Rust-based JavaScript tooling for the fastest builds." url="https://nextjs.org/" />
             <S1S2Card card={{
-                badges: {},
+                badges: {}, description: "", trophies: {},
                 cardcategory: "ultra-rare",
                 category: "CSS Framework",
-                description: "",
                 flag: "./Tailwind.png",
-                id: 101010151,
+                id: 3,
                 motto: "Rapidly build modern websites without ever leaving your HTML.",
                 name: "TailwindCSS",
                 region: "Tailwind Labs",
                 season: 2,
-                trophies: {},
-                type: "The CSS Solution of"
-            }}/>
+                type: "CSS Utility"
+            }} opt="A utility-first CSS framework packed with classes like flex, pt-4, text-center and rotate-90 that can be composed to build any design, directly in your markup." url="https://tailwindcss.com/" />
             </div>
-            <div className="flex">
+            <div className="flex flex-wrap justify-center">
                 <S1S2Card card={{
-                badges: {},
+                badges: {}, description: "", trophies: {},
                 cardcategory: "common",
                 category: "SQL Database",
-                description: "",
                 flag: "./PostgreSQL.png",
-                id: 101030101,
-                motto: "TypeScript is JavaScript with syntax for types.",
+                id: 4,
+                motto: "The World's Most Advanced Open Source Relational Database.",
                 name: "PostgreSQL",
-                region: "TypeScript",
+                region: "PostgreSQL Group",
                 season: 1,
-                trophies: {},
-                type: "The Programming Language of"
-            }}/>
+                type: "Database"
+            }} opt="PostgreSQL is a powerful, open source object-relational database system with over 35 years of active development that has earned it a strong reputation for reliability, feature robustness, and performance." url="https://www.postgresql.org/" />
             <S1S2Card card={{
-                badges: {},
+                badges: {}, description: "", trophies: {},
                 cardcategory: "rare",
                 category: "Data Cache",
-                description: "",
                 flag: "./Redis.png",
-                id: 101010101,
-                motto: "The React Framework for the Web",
+                id: 5,
+                motto: "A vibrant, open source database ",
                 name: "Redis",
-                region: "Redis",
+                region: "Redis Ltd",
                 season: 1,
-                trophies: {},
-                type: "The React Framework of"
-            }}/>
+                type: "In-Memory Data Store"
+            }} opt="The open source, in-memory data store used by millions of developers as a database, cache, streaming engine, and message broker." url="https://redis.io/" />
             <S1S2Card card={{
-                badges: {},
+                badges: {}, description: "", trophies: {},
                 cardcategory: "ultra-rare",
-                category: "CSS Framework",
-                description: "",
+                category: "Web Framework",
                 flag: "./FastAPI.png",
-                id: 101010151,
-                motto: "Rapidly build modern websites without ever leaving your HTML.",
+                id: 6,
+                motto: "FastAPI framework, high performance, easy to learn, fast to code, ready for production",
                 name: "FastAPI",
-                region: "Tailwind Labs",
+                region: "Tiangolo",
                 season: 1,
-                trophies: {},
-                type: "The CSS Solution of"
-            }}/>
+                type: "Python Framework"
+            }} opt="FastAPI is a modern, fast (high-performance), web framework for building APIs with Python 3.7+ based on standard Python type hints." url="https://fastapi.tiangolo.com/" />
             </div>
-            <div className="flex">
+            <div className="flex flex-wrap justify-center">
             <S3Card card={{
-                badges: {},
+                badges: {}, description: "", trophies: {},
                 cardcategory: "rare",
-                category: "SQL Database",
-                description: "",
+                category: "Containers",
                 flag: "./Docker.png",
-                id: 101030101,
-                motto: "TypeScript is JavaScript with syntax for types.",
+                id: 7,
+                motto: "Develop faster. Run anywhere.",
                 name: "Docker",
-                region: "TypeScript",
+                region: "Docker Inc",
                 season: 3,
-                trophies: {},
-                type: "The Programming Language of"
-            }}/>
+                type: "Virtualization"
+            }} opt="Accelerate how you build, share, and run modern applications. Docker makes development efficient and predictable." url="https://www.docker.com/" />
             <S3Card card={{
-                badges: {},
+                badges: {}, description: "", trophies: {},
                 cardcategory: "epic",
-                category: "Data Cache",
-                description: "",
+                category: "Continuous Integration",
                 flag: "./GithubActions.png",
-                id: 101010101,
-                motto: "The React Framework for the Web",
-                name: "Github Actions",
-                region: "Redis",
+                id: 8,
+                motto: "Automate your workflow from idea to production",
+                name: "GitHub Actions",
+                region: "GitHub",
                 season: 3,
-                trophies: {},
-                type: "The React Framework of"
-            }}/>
+                type: "Development Workflow"
+            }} opt="GitHub Actions makes it easy to automate all your software workflows, now with world-class CI/CD." url="https://docs.github.com/en/actions" />
             <S3Card card={{
-                badges: {},
+                badges: {}, description: "", trophies: {},
                 cardcategory: "legendary",
-                category: "CSS Framework",
-                description: "",
+                category: "Cloud Provider",
                 flag: "./Hetzner.png",
-                id: 101010151,
-                motto: "Rapidly build modern websites without ever leaving your HTML.",
+                id: 9,
+                motto: "Experience the Hetzner Cloud difference!.",
                 name: "Hetzner",
-                region: "Tailwind Labs",
+                region: "Hetzner",
                 season: 3,
-                trophies: {},
-                type: "The CSS Solution of"
-            }}/>
-            </div>
-            <div className="space-y-10 sm:grid sm:grid-flow-col sm:grid-cols-2 sm:grid-rows-3 sm:gap-x-6 sm:gap-y-14 sm:space-y-0 md:grid-cols-3 md:grid-rows-2 lg:gap-x-8">
-                <div className="relative flex flex-col justify-between rounded-lg border bg-card text-card-foreground shadow-sm transition-colors hover:border-purple-200">
-                    <div className="flex items-center bg-white/10 p-2 pl-5 transition-colors hover:bg-white/5">
-                        <a href="https://nextjs.org/" target="_blank" rel="noopener noreferrer" 
-                            className="text-lg font-medium leading-6 md:text-xl h-full rounded-md before:absolute before:inset-0 before:content-[''] focus:no-underline hover:no-underline active:no-underline">
-                            Next.js
-                        </a>
-                    </div>
-                    <div className="m-6 h-full text-sm md:text-base">
-                        Used by some of the world&apos;s largest companies, Next.js enables you to create full-stack Web applications by extending 
-                        the latest React features, and integrating powerful Rust-based JavaScript tooling for the fastest builds.
-                    </div>
-                </div>
-                <div className="relative flex flex-col justify-between rounded-lg border bg-card text-card-foreground shadow-sm transition-colors hover:border-purple-200">
-                    <div className="flex items-center bg-white/10 p-2 pl-5 transition-colors hover:bg-white/5 ">
-                        <a href="https://fastapi.tiangolo.com/" target="_blank" rel="noopener noreferrer" 
-                            className="text-lg font-medium leading-6 md:text-xl h-full rounded-md before:absolute before:inset-0 before:content-[''] focus:no-underline hover:no-underline active:no-underline">
-                            FastAPI
-                        </a>
-                    </div>
-                    <div className="m-6 h-full text-sm md:text-base">
-                        FastAPI is a modern, fast (high-performance), web framework for building APIs with Python 3.7+ based on standard Python type hints.
-                    </div>
-                </div>
-                <div className="relative flex flex-col justify-between rounded-lg border bg-card text-card-foreground shadow-sm transition-colors hover:border-purple-200">
-                    <div className="flex items-center bg-white/10 p-2 pl-5 transition-colors hover:bg-white/5">
-                        <a href="https://tailwindcss.com/" target="_blank" rel="noopener noreferrer" 
-                        className="text-lg font-medium leading-6 md:text-xl h-full rounded-md before:absolute before:inset-0 before:content-[''] focus:no-underline hover:no-underline active:no-underline">
-                            Tailwind CSS
-                        </a>
-                    </div>
-                    <div className="m-6 h-full text-sm md:text-base">
-                        A utility-first CSS framework packed with classes like flex, pt-4, text-center and rotate-90 that can be composed to build 
-                        any design, directly in your markup.
-                    </div>
-                </div>
-                <div className="relative flex flex-col justify-between rounded-lg border bg-card text-card-foreground shadow-sm transition-colors hover:border-purple-200">
-                    <div className="flex items-center bg-white/10 p-2 pl-5 transition-colors hover:bg-white/5">
-                        <a href="https://ui.shadcn.com/" target="_blank" rel="noopener noreferrer" 
-                        className="text-lg font-medium leading-6 md:text-xl h-full rounded-md before:absolute before:inset-0 before:content-[''] focus:no-underline hover:no-underline active:no-underline">
-                            shadcn/ui
-                        </a>
-                    </div>
-                    <div className="m-6 h-full text-sm md:text-base">
-                    Beautifully designed components that you can copy and paste into your apps. Accessible. Customizable. Open Source.
-                    </div>
-                </div>
-                <div className="relative flex flex-col justify-between rounded-lg border bg-card text-card-foreground shadow-sm transition-colors hover:border-purple-200">
-                    <div className="flex items-center bg-white/10 p-2 pl-5 transition-colors hover:bg-white/5">
-                        <a href="https://tailwindcss.com/" target="_blank" rel="noopener noreferrer" 
-                        className="text-lg font-medium leading-6 md:text-xl h-full rounded-md before:absolute before:inset-0 before:content-[''] focus:no-underline hover:no-underline active:no-underline">
-                            TypeScript
-                        </a>
-                    </div>
-                    <div className="m-6 h-full text-sm md:text-base">
-                        TypeScript is a strongly typed programming language that builds on JavaScript, giving you better tooling at any scale.
-                    </div>
-                </div>
-                <div className="relative flex flex-col justify-between rounded-lg border bg-card text-card-foreground shadow-sm transition-colors hover:border-purple-200">
-                    <div className="flex items-center bg-white/10 p-2 pl-5 transition-colors hover:bg-white/5">
-                        <a href="https://railway.app/" target="_blank" rel="noopener noreferrer" 
-                        className="text-lg font-medium leading-6 md:text-xl h-full rounded-md before:absolute before:inset-0 before:content-[''] focus:no-underline hover:no-underline active:no-underline">
-                            Railway
-                        </a>
-                    </div>
-                    <div className="m-6 h-full text-sm md:text-base">
-                        Made for any language, for projects big and small. Railway is the cloud that takes the complexity out of shipping software.
-                    </div>
-                </div>
+                type: "Virtual Private Server"
+            }} opt="A little money gets you lots of cloud. Flexible cloud servers with high-end-hardware." url="https://www.hetzner.com/" />
             </div>
             <p className="leading-7 [&:not(:first-child)]:mt-6">Credit to UPC/r3n for API inspiration.</p>
         </main>
