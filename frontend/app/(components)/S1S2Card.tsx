@@ -10,7 +10,7 @@ export function S1S2Card({ card }: { card: Card }) {
                 <div className={`deckcard deckcard-season-${card.season}`} data-cardid={card.id} data-season={card.season}>
                     <figure className={`front deckcard-category-${card.cardcategory}`} >
                         <div className="deckcard-flag"
-                            style={{ backgroundImage: `url(https://www.nationstates.net/images/cards/s${card.season}/${card.flag})` }}>
+                            style={{ backgroundImage: `url(${card.flag.includes('./') ? card.flag : `https://www.nationstates.net/images/cards/s${card.season}/${card.flag}`})` }}>
                         </div>
                         <div className="deckcard-category"></div>
                         <div className="deckcard-title"><p className="nlink nameblock"><span
@@ -33,7 +33,7 @@ export function S1S2Card({ card }: { card: Card }) {
                                 <Badges cardBadges={card.badges as {[key: string]: string}} cardTrophies={Object.keys(card.trophies)} />
                             </div>
                             <div className="deckcard-desc">
-                                {card.season === 1 ? `${card.description}` : <S2S3Description description={card.description} />}
+                                {card.description ? card.season === 1 ? `${card.description}` : <S2S3Description description={card.description}  /> : ""}
                             </div>
                         </div>
                         <div className="deckcard-stripe">

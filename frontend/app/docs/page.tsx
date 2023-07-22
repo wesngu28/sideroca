@@ -9,7 +9,7 @@ export default function Docs() {
                 <h1 className="text-7xl my-2 tracking-tight">Card <span className='text-purple-700'>Queries</span></h1>
                 <Link href="/"><Button className='rounded-md text-sm font-medium px-4 py-2 my-2'><Home /></Button></Link>
             </div>
-            <Link className="mt-3 mb-6 transition-colors duration-300 hover:text-purple-700" href="https://nscards.up.railway.app/cards">https://nscards.up.railway.app/cards</Link>
+            <Link className="mt-3 mb-6 transition-colors duration-300 hover:text-purple-700" href="https://api.sideroca.com/cards">https://api.sideroca.com/cards</Link>
             <div className="flex flex-col gap-8 max-w-[300px] phone:max-w-5xl">
                 <div>
                 <p className="leading-7 [&:not(:first-child)]:mt-6">

@@ -1,6 +1,9 @@
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Home } from "lucide-react";
+import '../styles.css'
+import { S1S2Card } from "../(components)/S1S2Card";
+import { S3Card } from "../(components)/S3Card";
 
 export default function Dev() {
     return (
@@ -12,6 +15,138 @@ export default function Dev() {
             <h2 className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0">
                 Stack
             </h2>
+            <div className="flex">
+                <S1S2Card card={{
+                badges: {},
+                cardcategory: "uncommon",
+                category: "JS Superset",
+                description: "",
+                flag: "./TypeScript.png",
+                id: 101030101,
+                motto: "TypeScript is JavaScript with syntax for types.",
+                name: "TypeScript",
+                region: "TypeScript",
+                season: 2,
+                trophies: {},
+                type: "The Programming Language of"
+            }}/>
+            <S1S2Card card={{
+                badges: {},
+                cardcategory: "rare",
+                category: "Frontend Framework",
+                description: "",
+                flag: "./nextjs-icon.svg",
+                id: 101010101,
+                motto: "The React Framework for the Web",
+                name: "Next.js",
+                region: "Vercel",
+                season: 2,
+                trophies: {},
+                type: "The React Framework of"
+            }}/>
+            <S1S2Card card={{
+                badges: {},
+                cardcategory: "ultra-rare",
+                category: "CSS Framework",
+                description: "",
+                flag: "./Tailwind.png",
+                id: 101010151,
+                motto: "Rapidly build modern websites without ever leaving your HTML.",
+                name: "TailwindCSS",
+                region: "Tailwind Labs",
+                season: 2,
+                trophies: {},
+                type: "The CSS Solution of"
+            }}/>
+            </div>
+            <div className="flex">
+                <S1S2Card card={{
+                badges: {},
+                cardcategory: "common",
+                category: "SQL Database",
+                description: "",
+                flag: "./PostgreSQL.png",
+                id: 101030101,
+                motto: "TypeScript is JavaScript with syntax for types.",
+                name: "PostgreSQL",
+                region: "TypeScript",
+                season: 1,
+                trophies: {},
+                type: "The Programming Language of"
+            }}/>
+            <S1S2Card card={{
+                badges: {},
+                cardcategory: "rare",
+                category: "Data Cache",
+                description: "",
+                flag: "./Redis.png",
+                id: 101010101,
+                motto: "The React Framework for the Web",
+                name: "Redis",
+                region: "Redis",
+                season: 1,
+                trophies: {},
+                type: "The React Framework of"
+            }}/>
+            <S1S2Card card={{
+                badges: {},
+                cardcategory: "ultra-rare",
+                category: "CSS Framework",
+                description: "",
+                flag: "./FastAPI.png",
+                id: 101010151,
+                motto: "Rapidly build modern websites without ever leaving your HTML.",
+                name: "FastAPI",
+                region: "Tailwind Labs",
+                season: 1,
+                trophies: {},
+                type: "The CSS Solution of"
+            }}/>
+            </div>
+            <div className="flex">
+            <S3Card card={{
+                badges: {},
+                cardcategory: "rare",
+                category: "SQL Database",
+                description: "",
+                flag: "./Docker.png",
+                id: 101030101,
+                motto: "TypeScript is JavaScript with syntax for types.",
+                name: "Docker",
+                region: "TypeScript",
+                season: 3,
+                trophies: {},
+                type: "The Programming Language of"
+            }}/>
+            <S3Card card={{
+                badges: {},
+                cardcategory: "epic",
+                category: "Data Cache",
+                description: "",
+                flag: "./GithubActions.png",
+                id: 101010101,
+                motto: "The React Framework for the Web",
+                name: "Github Actions",
+                region: "Redis",
+                season: 3,
+                trophies: {},
+                type: "The React Framework of"
+            }}/>
+            <S3Card card={{
+                badges: {},
+                cardcategory: "legendary",
+                category: "CSS Framework",
+                description: "",
+                flag: "./Hetzner.png",
+                id: 101010151,
+                motto: "Rapidly build modern websites without ever leaving your HTML.",
+                name: "Hetzner",
+                region: "Tailwind Labs",
+                season: 3,
+                trophies: {},
+                type: "The CSS Solution of"
+            }}/>
+            </div>
             <div className="space-y-10 sm:grid sm:grid-flow-col sm:grid-cols-2 sm:grid-rows-3 sm:gap-x-6 sm:gap-y-14 sm:space-y-0 md:grid-cols-3 md:grid-rows-2 lg:gap-x-8">
                 <div className="relative flex flex-col justify-between rounded-lg border bg-card text-card-foreground shadow-sm transition-colors hover:border-purple-200">
                     <div className="flex items-center bg-white/10 p-2 pl-5 transition-colors hover:bg-white/5">
