@@ -40,7 +40,11 @@ function convertJSONToCSV(jsonData: Card[]) {
     csvRows.push(headers.join(','));
     jsonData.forEach((row) => {
         const values = headers.map((header) => {
-            const escapedValue = String(row[header as keyof Card]).replace(/"/g, '""');
+            let value = row[header as keyof Card];
+            if (typeof value === 'object') {
+              value = JSON.stringify(value);
+            }
+            const escapedValue = String(value).replace(/"/g, '""');
             return `"${escapedValue}"`;
         });
         csvRows.push(values.join(','));
