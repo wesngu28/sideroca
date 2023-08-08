@@ -40,3 +40,7 @@ venv
 backend/cards.db
 .env
 .rdb
+
+# server
+npm
+portainer
