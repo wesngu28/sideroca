@@ -8,6 +8,7 @@ const inter = Inter({ subsets: ['latin'] })
 export const metadata = {
   title: 'Sideroca - Card Queries',
   description: 'Streamlined Interactions and Dynamic Enhancements for Really Obtuse Cards Applications',
+  metadataBase: new URL('https://sideroca.com')
 }
 
 export default function RootLayout({
