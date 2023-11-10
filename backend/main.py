@@ -118,7 +118,7 @@ async def index(
         if rarity:
             cardcategory = rarity
 
-        if set(query_params.keys()) == {"deck"} or set(query_params.keys()) == {"collection"}:
+        if set(request.query_params.keys.keys()) == {"deck"} or set(request.query_params.keys.keys()) == {"collection"}:
             return {"cards": []}
         if all(value is None for value in request.query_params.keys()):
             return {"cards": []}
