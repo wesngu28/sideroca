@@ -228,7 +228,8 @@ async def index(
                 query_finales = query_finales.all()
                 card_dicts = {"cards": [{key: getattr(card, key) for key in card.__table__.columns.keys()} for card in query_finales]}
                 for card_dict in card_dicts["cards"]:
-                    card_dict["link"] = f"https://www.nationstates.net/page=deck/card={card_dict['id']}/season={card_dict['season']}"
+                    info = ({"signal": f"{card_dict['name']},{card_dict['season']}", "link": f"https://www.nationstates.net/page=deck/card={card_dict['id']}/season={card_dict['season']}"})
+                    card_dict.update(info)
                 if len(card_dicts["cards"]) > 12000:
                     filtered_card_dicts = {"cards": [{"name": card['name'], "id": card['id'], "season": card['season']} for card in card_dicts['cards']]}
                     cache.set(str(request.query_params), json.dumps(filtered_card_dicts))
