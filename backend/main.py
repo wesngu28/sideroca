@@ -181,7 +181,8 @@ async def index(
                                         format_or_badges.append(f"{word.upper()}-10")
                                     else:
                                         formatted_words.append(word.upper())
-                                        format_and_badges.append(' '.join(formatted_words))
+                            if (len(formatted_words) > 0):
+                                format_and_badges.append(' '.join(formatted_words))
                         if 'sqlite' in os.environ['DATABASE_URL']:
                             or_badges_queries = [~(getattr(models.Card, param)[badge[1:]]) if badge.startswith('!') else getattr(models.Card, param)[badge] for badge in format_or_badges]
                             and_badges_queries = [~(getattr(models.Card, param)[badge[1:]]) if badge.startswith('!') else getattr(models.Card, param)[badge] for badge in format_and_badges]
@@ -217,7 +218,7 @@ async def index(
 
             if all(value is None for value in (name, type, motto, category, region, flag, badges, trophies, cardcategory)) and season is not None:
                 mode = "names"
-            
+
             if (mode is not None and mode == "names"):
                 query_finales = query_finales.with_entities(models.Card.name, models.Card.id, models.Card.season).all()
                 res_names = {"cards": [{"name": card.name, "id": card.id, "season": card.season} for card in query_finales]}
@@ -247,7 +248,7 @@ async def index(
     except Exception as e:
         print(f"Error in /cards endpoint: {e}")
         raise HTTPException(status_code=500, detail="The server had trouble understanding your request.")
-        
+
 @app.post("/collection")
 @limiter.limit("30/minute")
 async def index(request: Request, db: Session = Depends(get_db), cache: Union[Redis, None] = Depends(get_redis),):
