@@ -183,6 +183,7 @@ async def index(
                                         formatted_words.append(word.upper())
                             if (len(formatted_words) > 0):
                                 format_and_badges.append(' '.join(formatted_words))
+
                         if 'sqlite' in os.environ['DATABASE_URL']:
                             or_badges_queries = [~(getattr(models.Card, param)[badge[1:]]) if badge.startswith('!') else getattr(models.Card, param)[badge] for badge in format_or_badges]
                             and_badges_queries = [~(getattr(models.Card, param)[badge[1:]]) if badge.startswith('!') else getattr(models.Card, param)[badge] for badge in format_and_badges]
@@ -200,6 +201,7 @@ async def index(
                         formatted_values = [~getattr(models.Card, param).ilike(f"%{value[1:].replace(' ', '_')}%") if value is not None and value.startswith('!') else getattr(models.Card, param).ilike(f"%{value.replace(' ', '_')}%") if value is not None else True for value in values]
                         match_queries.append(or_(*formatted_values) if formatted_values is not None else True)
 
+                match_queries = match_queries + [or_(*or_badges_queries)] + [and_(*and_badges_queries if and_badges_queries is not None else True)]
                 if param in ('category', 'cardcategory'):
                     value = request.query_params[param]
                     values = value.split(",") if value else []
@@ -207,13 +209,12 @@ async def index(
                         values = [' '.join(word.capitalize() if word[0].isalpha() else word[0] + word[1].capitalize() + word[2:] for word in value.split('_')) for value in values]
                     formatted_values = [~(getattr(models.Card, param) == value[1:]) if value is not None and value.startswith('!') else getattr(models.Card, param) == value if value is not None else True for value in values]
                     match_queries.append(or_(*formatted_values))
+
             query_finales = db.query(models.Card).filter(
                     models.Card.season != str(season[1:]) if str(season).startswith('!') else models.Card.season == str(season) if season is not None else True,
                     models.Card.region.is_(None) if exnation is not None else True,
                     *match_queries if match_queries is not None else True,
                     *sans_queries if sans_queries is not None else True,
-                    or_(*or_badges_queries) if or_badges_queries is not None else True,
-                    *and_badges_queries if and_badges_queries is not None else True,
             )
 
             if all(value is None for value in (name, type, motto, category, region, flag, badges, trophies, cardcategory)) and season is not None:
