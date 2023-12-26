@@ -44,3 +44,6 @@ backend/cards.db
 # server
 npm
 portainer
+
+# api test
+.bruno
