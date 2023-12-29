@@ -2,7 +2,7 @@ import hashlib
 import re
 import os
 import json
-from fastapi import FastAPI, Depends, Request, HTTPException, Query
+from fastapi import FastAPI, Depends, Request, HTTPException
 from starlette.responses import RedirectResponse
 from pydantic import BaseModel, create_model
 from sqlalchemy import or_, and_, select
@@ -279,8 +279,9 @@ async def index(request: Request, db: Session = Depends(get_db), cache: Union[Re
 
 @app.get("/cards/{name}")
 async def get_card_by_name(db: Session = Depends(get_db), name: str | None = None):
+    name = name.lower()
     card = db.query(models.Card).filter(
-        models.Card.name == name,
+        models.Card.name.ilike(name),
     ).first()
     if card:
         return {"card": {"name": card.name, "season": card.season, "id": card.id}}
