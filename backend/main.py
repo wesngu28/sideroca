@@ -278,7 +278,7 @@ async def index(request: Request, db: Session = Depends(get_db), cache: Union[Re
         raise HTTPException(status_code=500, detail="The server had trouble understanding your request.")
 
 @app.get("/cards/{name}")
-async def get_card_by_name(db: Session = Depends(get_db), name: str = Query(..., description="The name of the card")):
+async def get_card_by_name(db: Session = Depends(get_db), name: str | None = None):
     card = db.query(models.Card).filter(
         models.Card.name == name,
     ).first()
