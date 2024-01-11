@@ -1,5 +1,5 @@
 import Link from "next/link";
-import HelloWorld from "./docs.mdx";
+import Docs from "./docs.mdx";
 import { Button } from "@/components/ui/button";
 import { Home } from "lucide-react";
 
@@ -24,8 +24,8 @@ export default function Page() {
           https://api.sideroca.com/cards
         </Link>
       </div>
-      <div className="prose mx-auto mb-36 max-w-[300px] phone:max-w-5xl">
-        <HelloWorld />
+      <div className="prose dark:prose-invert mx-auto mb-36 max-w-[300px] phone:max-w-5xl">
+        <Docs />
       </div>
     </main>
   );
