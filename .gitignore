@@ -47,3 +47,6 @@ portainer
 
 # api test
 .bruno
+
+#glances
+glances.pwd
