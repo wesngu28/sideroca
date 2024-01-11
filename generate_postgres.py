@@ -51,7 +51,7 @@ for prefix in prefixes:
                             card['FLAG'], card['CARDCATEGORY'], card['DESCRIPTION'],
                             json.dumps(card['BADGES']), json.dumps(card['TROPHIES'])
                         ))
-                        print(f'adding {card['NAME']} - season {card[]}')
+                        print(f'adding {card['NAME']} - season {card['SEASON']}')
 
 connection.commit()
 connection.close()
