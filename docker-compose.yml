@@ -49,12 +49,16 @@ services:
         POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
       volumes:
         - pgdata:/var/lib/postgresql/data
+      networks:
+        - reverse-proxy
     cache:
       restart: always
       image: redis:alpine
       container_name: CardQueriesCache
       volumes:
         - redis:/data
+      networks:
+        - reverse-proxy
     autoheal:
       restart: always
       image: willfarrell/autoheal
@@ -62,7 +66,8 @@ services:
         - AUTOHEAL_CONTAINER_LABEL=all
       volumes:
         - /var/run/docker.sock:/var/run/docker.sock
-
+      networks:
+        - reverse-proxy
 volumes:
   pgdata:
     external: true
