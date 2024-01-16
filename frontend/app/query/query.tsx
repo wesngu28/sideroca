@@ -292,7 +292,7 @@ export function Query() {
                         <div className='flex flex-wrap justify-center'>
                             {!correspondingJson[0].motto ?
                                 <div className='flex flex-col dark:text-white'>
-                                    {currentItems.map((card, i) => <p className={`${card.inCollection == false ? 'text-red-500' : 'text-blue-500'}`} key={i}>{card.name}</p>)}
+                                    {currentItems.map((card, i) => <a href={`https://www.nationstates.net/page=deck/card=${card.id}/season=${card.season}`} className={`${card.inCollection == false ? 'text-red-500' : 'text-blue-500'}`} key={i}>{card.name}</a>)}
                                 </div>
                                 :
                                 currentItems.map((card, i) =>
