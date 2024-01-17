@@ -20,7 +20,7 @@ export default function Home() {
 
   const [queries, setQueries] = useState<string[]>([])
   const [collectionType, setCollectionType] = useState("Collection")
-  const [render, setRender] = useState("Cards")
+  const [render, setRender] = useState("Names")
   const [route, setRoute] = useState(true)
   const [manualInput, setManualInput] = useState("")
 
@@ -111,7 +111,7 @@ export default function Home() {
     queries.unshift(baseString)
     localStorage.setItem('queries', JSON.stringify(queries));
     setQueries(Array.from(queries))
-    if (formData.get('mode') === 'on') baseString += "&mode=name"
+    if (formData.get('mode') === 'on') baseString += "&mode=cards"
     router.push(`/query${baseString}`)
   }
 
@@ -128,7 +128,11 @@ export default function Home() {
         </div>
         {route === true ?
           <form className='flex flex-col items-center' onSubmit={(e) => makeRequest(e)} name='card'>
-            <p>Enter your query manually, or fill out the form.</p>
+            <p className='text-xs max-w-xs text-center'>
+              Due to server resource constraints and crashes when rendering an enormous amount of cards, the default is now set to just render the season, category,
+              and name of the card, while linking to it, as pretty as the cards are.
+            </p>
+            <p className="mt-4">Enter your query manually, or fill out the form.</p>
             <p className='mb-6 text-xs'>(IE: name=testlandia)</p>
             <Input className='mb-6 w-full' placeholder={"/card?"} name="manual" value={manualInput} onChange={(e) => setManualInput(e.target.value)} />
             <FormItem label='Filter Season'>

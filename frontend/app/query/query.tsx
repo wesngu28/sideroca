@@ -327,15 +327,6 @@ export function Query() {
             <Home />
           </Button>
         </a>
-        {correspondingJson.length > 0 && (
-          <Button
-            variant={"outline"}
-            onClick={handleDownload}
-            className="text-white transition duration-500 bg-blue-700 hover:bg-blue-600 mb-8"
-          >
-            <Download />
-          </Button>
-        )}
       </div>
       <h4 className="leading-7">
         Your current queries to NS API: {queryTracker}/30
@@ -346,6 +337,15 @@ export function Query() {
       {correspondingJson.length > 0 ? (
         <>
           <p className="dark:text-white text-lg font-bold mb-2">?{lastQuery}</p>
+          {correspondingJson.length > 0 && (
+            <Button variant={"outline"}
+                data-umami-event="Downloaded"
+                onClick={handleDownload}
+                className="mb-2 transition duration-500 bg-purple-700 hover:bg-purple-500 border-none"
+                type='submit'>
+                    Download
+            </Button>
+            )}
           <div className="flex flex-col flex-wrap items-center gap-4 dark:text-white">
             <div className="flex gap-4 mt-4">
               <DropdownMenu>
