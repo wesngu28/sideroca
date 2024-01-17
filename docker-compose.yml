@@ -1,78 +1,85 @@
 version: "3.9"
 services:
-    web:
-      build:
-        context: ./frontend
-        dockerfile: NextJSDockerfile
-      container_name: CardQueries
-      restart: always
-      command: npm run start
-      volumes:
-        - ./frontend:/app
-        - /app/node_modules
-        - /app/.next
-      networks:
-        - reverse-proxy
-    backend:
-      build:
-        context: ./backend
-        dockerfile: FastAPIDockerfile
-      volumes:
-        - ./backend:/usr/src/app
-      container_name: CardQueriesAPI
-      environment:
-        DATABASE_URL: ${DATABASE_URL}
-        REDISHOST: ${REDISHOST}
-        REDISPORT: ${REDISPORT}
-        REDIS_URL: ${REDIS_URL}
-      depends_on:
-        - db
-        - cache
-      restart: always
-      healthcheck:
-        test: ["CMD", "curl", "--fail", "-s", "-o", "/dev/null", "https://api.sideroca.com/health"]
-        interval: 60s
-        timeout: 10s
-        retries: 3
-      links:
-        - db
-        - cache
-      networks:
-        - reverse-proxy
-    db:
-      image: postgres:14
-      restart: always
-      container_name: CardQueriesDB
-      environment:
-        POSTGRES_USER: ${DATABASE_USER}
-        POSTGRES_DB: ${DATABASE_NAME}
-        POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
-      volumes:
-        - pgdata:/var/lib/postgresql/data
-      networks:
-        - reverse-proxy
-    cache:
-      restart: always
-      image: redis:alpine
-      container_name: CardQueriesCache
-      volumes:
-        - redis:/data
-      networks:
-        - reverse-proxy
-    autoheal:
-      restart: always
-      image: willfarrell/autoheal
-      environment:
-        - AUTOHEAL_CONTAINER_LABEL=all
-      volumes:
-        - /var/run/docker.sock:/var/run/docker.sock
-      networks:
-        - reverse-proxy
+  web:
+    build:
+      context: ./frontend
+      dockerfile: NextJSDockerfile
+    container_name: CardQueries
+    restart: always
+    command: npm run start
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+    networks:
+      - reverse-proxy
+  backend:
+    build:
+      context: ./backend
+      dockerfile: FastAPIDockerfile
+    volumes:
+      - ./backend:/usr/src/app
+    container_name: CardQueriesAPI
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      REDISHOST: ${REDISHOST}
+      REDISPORT: ${REDISPORT}
+      REDIS_URL: ${REDIS_URL}
+    depends_on:
+      - db
+      - cache
+    restart: always
+    mem_limit: 1g
+    healthcheck:
+      test:
+        - CMD
+        - curl
+        - --fail
+        - -s
+        - -o
+        - /dev/null
+        - https://api.sideroca.com/health
+      interval: 60s
+      timeout: 10s
+      retries: 3
+    links:
+      - db
+      - cache
+    networks:
+      - reverse-proxy
+  db:
+    image: postgres:14
+    restart: always
+    container_name: CardQueriesDB
+    environment:
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_DB: ${DATABASE_NAME}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - reverse-proxy
+  cache:
+    restart: always
+    image: redis:alpine
+    container_name: CardQueriesCache
+    volumes:
+      - redis:/data
+    networks:
+      - reverse-proxy
+  autoheal:
+    restart: always
+    image: willfarrell/autoheal
+    environment:
+      - AUTOHEAL_CONTAINER_LABEL=all
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - reverse-proxy
 volumes:
   pgdata:
     external: true
-  redis:
-
+  redis: null
 networks:
   reverse-proxy:
     external: true

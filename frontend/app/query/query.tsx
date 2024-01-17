@@ -398,7 +398,7 @@ export function Query() {
                       }`}
                       key={i}
                     >
-                      {card.season} {card.name} ({card.cardcategory[0]})
+                      {card.season} {card.name} ({card.cardcategory === "ultra-rare" ? card.cardcategory.slice(0, 2) : card.cardcategory[0]})
                     </a>
                   ))}
                 </div>

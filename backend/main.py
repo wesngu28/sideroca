@@ -182,15 +182,9 @@ async def index(
             )
 
             if all(value is None for value in (name, type, motto, category, region, flag, badges, trophies, cardcategory)) and season is not None:
-                mode = "names"
+                mode = "not none"
 
-            if (mode is not None and mode == "names"):
-                query_finales = query_finales.with_entities(models.Card.name, models.Card.id, models.Card.season).all()
-                res_names = {"cards": [{"name": card.name, "id": card.id, "season": card.season} for card in query_finales]}
-                cache.set(str(request.query_params), json.dumps(res_names))
-                cache.expire(str(request.query_params), 3600)
-                return res_names
-            else:
+            if (mode is not None or mode == "cards"):
                 query_finales = query_finales.all()
                 card_dicts = {"cards": [{key: getattr(card, key) for key in card.__table__.columns.keys()} for card in query_finales]}
                 for card_dict in card_dicts["cards"]:
@@ -205,6 +199,16 @@ async def index(
                     cache.set(str(request.query_params), json.dumps(card_dicts))
                     cache.expire(str(request.query_params), 3600)
                     return card_dicts
+            else:
+                print ("this where I am this where I be top billin is not a G")
+                query_finales = query_finales.with_entities(models.Card.name, models.Card.id, models.Card.season, models.Card.cardcategory).all()
+                res_names = {"cards": [{"name": card.name, "id": card.id, "season": card.season, "cardcategory": card.cardcategory} for card in query_finales]}
+                for card_dict in res_names["cards"]:
+                    info = ({"signal": f"{card_dict['name']},{card_dict['season']}", "link": f"https://www.nationstates.net/page=deck/card={card_dict['id']}/season={card_dict['season']}"})
+                    card_dict.update(info)
+                cache.set(str(request.query_params), json.dumps(res_names))
+                cache.expire(str(request.query_params), 3600)
+                return res_names
 
     except HTTPException as http_exception:
         if http_exception.status_code != 400:
