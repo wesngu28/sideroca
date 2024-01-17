@@ -15,7 +15,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    
+
     steps:
     - name: Deploy project
       uses: appleboy/ssh-action@master
@@ -26,7 +26,7 @@ jobs:
         passphrase: ${{ secrets.SSH_KEY_PASSPHRASE }}
         port: ${{ secrets.PORT }}
         script: |
-          cd actioncardqueries
+          cd docker/actioncardqueries
           git pull origin main
           git status
           docker-compose stop web
