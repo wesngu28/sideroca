@@ -134,10 +134,11 @@ async def index(
                     for badge in values:
                         formatted_words = []
                         for word in badge.split('_'):
-                            if word.lower() == "wa":
-                                formatted_words.append(word.upper())
-                            elif param == 'badges':
-                                if word[0].isalpha():
+                            if param == 'badges':
+                                print (word)
+                                if word.lower() == "wa":
+                                    formatted_words.append(word.upper())
+                                elif word[0].isalpha():
                                     formatted_words.append(word.capitalize())
                                 else:
                                     formatted_words.append(word[0] + word[1].capitalize())
